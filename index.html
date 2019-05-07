@@ -2,44 +2,173 @@
     <head>
         <link rel="stylesheet" type="text/css" href="style.css">
     </head>
-
     <body>
-
         <div id="gridWrapper">
-            <div id="keyboardLayoutSelectSection" class="gridItem">
+
+            <fieldset id="keyboardLayoutSelectSection" class="gridItem">
+                <legend>keyboard layout</legend>
                 <select id="keyboardLayoutSelect">
                     <option>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</option>
                     <option></option>
                     <option></option>
                 </select>
-            </div>
+            </fieldset>
 
-            <div id="arpeggiatorSection" class="gridItem">
-                <div id="arpeggiatorNone"></div>
-                <div id="arpeggiatorUp"></div>
-                <div id="arpeggiatorDown"></div>
-                <div id="arpeggiatorUpDown"></div>
-                <div id="noteOrder"></div>
-                <div id="octave1"></div>
-                <div id="octave2"></div>
-            </div>
-
-            <div id="delaySection" class="gridItem">
-                <div id="delayMs"></div>
-                <div id="delayRepeats"></div>
-            </div>
-
-            <div id="eventLogSection" class="gridItem">
-                <div id="eventLog"></div>
-            </div>
-
-            <div id="deviceSelectSection" class="gridItem">
+            <fieldset id="deviceSelectSection" class="gridItem">
+                <legend>output</legend>
                 <select id="deviceSelect">
-                    <option></option>
+                    <option>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</option>
                     <option></option>
                     <option></option>
                 </select>
-            </div>
+            </fieldset>
+
+
+            <fieldset id="octaveSection" class="gridItem">
+                <legend>octave</legend>
+                <div id="octaveSectionGrid">
+                    <div>00</div>
+                    <div>01</div>
+                    <div>02</div>
+                    <div>03</div>
+                </div>
+            </fieldset>
+
+
+            <fieldset id="channelSection" class="gridItem">
+                <legend>channel</legend>
+                <div id="channelSectionGrid">
+                    <div>00</div>
+                    <div>01</div>
+                    <div>02</div>
+                    <div>03</div>
+                    <div>04</div>
+                    <div>05</div>
+                    <div>06</div>
+                    <div>07</div>
+                    <div>08</div>
+                    <div>09</div>
+                    <div>10</div>
+                    <div>11</div>
+                    <div>12</div>
+                    <div>13</div>
+                    <div>14</div>
+                    <div>15</div>
+                </div>
+            </fieldset>
+
+            <fieldset id="arpeggiatorModeSection" class="gridItem">
+                <legend>arp mode</legend>
+                <div id="arpeggiatorModeSectionGrid">
+                    <div id="arpeggiatorNone">off</div>
+                    <div id="arpeggiatorUp">up_</div>
+                    <div id="arpeggiatorDown">dwn</div>
+                    <div id="arpeggiatorUpDown">udw</div>
+                    <div id="arpeggiatorOrder">ord</div>
+                    <div id="arpeggiatorReverse">rev</div>
+                    <div id="arpeggiatorRandom">rnd</div>
+                    <div id="arpeggiatorRandom2">rd2</div>
+                    <div id="arpeggiatorUp2">up2</div>
+                    <div id="arpeggiatorDown2">dw2</div>
+                </div>
+            </fieldset>
+
+            <fieldset id="arpeggiatorTimeDivisionSection" class="gridItem">
+                <legend>arp div</legend>
+                <div id="arpeggiatorTimeDivisionSectionGrid">
+                    <div id="wholeNote">01_</div>
+                    <div id="halfNoteDotted">02.</div>
+                    <div id="halfNote">02_</div>
+                    <div id="quarterNoteDotted">04.</div>
+                    <div id="quarterNote">04_</div>
+                    <div id="eighthNoteDotted">08.</div>
+                    <div id="eighthNote">08.</div>
+                    <div id="sixteenthNoteDotted">16.</div>
+                    <div id="sixteenthNote">16_</div>
+                    <div id="thirtySecondNote">32_</div>
+                </div>
+            </fieldset>
+
+            <fieldset id="arpeggiatorGateSection" class="gridItem">
+                <legend>arp gate</legend>
+                <div id="arpeggiatorGateSectionGrid">
+                    <div id="arpeggiatorGate10Percent">10</div>
+                    <div id="arpeggiatorGate25Percent">25</div>
+                    <div id="arpeggiatorGate50Percent">50</div>
+                    <div id="arpeggiatorGate75Percent">75</div>
+                    <div id="arpeggiatorGate90Percent">90</div>
+                </div>
+            </fieldset>
+
+            <fieldset id="delayTimeDivisionSection" class="gridItem">
+                <legend>delay time</legend>
+                <div id="delayTimeDivisionSectionGrid">
+                    <div id="wholeNote">01_</div>
+                    <div id="halfNoteDotted">02.</div>
+                    <div id="halfNote">02_</div>
+                    <div id="quarterNoteDotted">04.</div>
+                    <div id="quarterNote">04_</div>
+                    <div id="eighthNoteDotted">08.</div>
+                    <div id="eighthNote">08.</div>
+                    <div id="sixteenthNoteDotted">16.</div>
+                    <div id="sixteenthNote">16_</div>
+                    <div id="thirtySecondNote">32_</div>
+                </div>
+            </fieldset>
+
+            <fieldset id="delayRepeatSection" class="gridItem">
+                <legend>delay repeat</legend>
+                <div id="delayRepeatSectionGrid">
+                <div>00</div>
+                <div>01</div>
+                <div>02</div>
+                <div>03</div>
+                <div>04</div>
+                <div>05</div>
+                <div>06</div>
+                <div>07</div>
+                <div>08</div>
+                <div>09</div>
+                </div>
+            </fieldset>
+
+            <fieldset id="programChangeSection" class="gridItem">
+                <legend>program change</legend>
+                <div id="programChangeSectionGrid">
+                    <!--
+
+                        (  =___= )
+
+                    -->
+                    <div>000</div> <div>001</div> <div>002</div> <div>003</div> <div>004</div> <div>005</div> <div>006</div> <div>007</div>
+                    <div>008</div> <div>009</div> <div>010</div> <div>011</div> <div>012</div> <div>013</div> <div>014</div> <div>015</div>
+                    <div>016</div> <div>017</div> <div>018</div> <div>019</div> <div>020</div> <div>021</div> <div>022</div> <div>023</div>
+                    <div>024</div> <div>025</div> <div>026</div> <div>027</div> <div>028</div> <div>029</div> <div>030</div> <div>031</div>
+                    <div>032</div> <div>033</div> <div>034</div> <div>035</div> <div>036</div> <div>037</div> <div>038</div> <div>039</div>
+                    <div>040</div> <div>041</div> <div>042</div> <div>043</div> <div>044</div> <div>045</div> <div>046</div> <div>047</div>
+                    <div>048</div> <div>049</div> <div>050</div> <div>051</div> <div>052</div> <div>053</div> <div>054</div> <div>055</div>
+                    <div>056</div> <div>057</div> <div>058</div> <div>059</div> <div>060</div> <div>061</div> <div>062</div> <div>063</div>
+                    <div>064</div> <div>065</div> <div>066</div> <div>067</div> <div>068</div> <div>069</div> <div>070</div> <div>071</div>
+                    <div>072</div> <div>073</div> <div>074</div> <div>075</div> <div>076</div> <div>077</div> <div>078</div> <div>079</div>
+                    <div>080</div> <div>081</div> <div>082</div> <div>083</div> <div>084</div> <div>085</div> <div>086</div> <div>087</div>
+                    <div>088</div> <div>089</div> <div>090</div> <div>091</div> <div>092</div> <div>093</div> <div>094</div> <div>095</div>
+                    <div>096</div> <div>097</div> <div>098</div> <div>099</div> <div>100</div> <div>101</div> <div>102</div> <div>103</div>
+                    <div>104</div> <div>105</div> <div>106</div> <div>107</div> <div>108</div> <div>109</div> <div>110</div> <div>111</div>
+                    <div>112</div> <div>113</div> <div>114</div> <div>115</div> <div>116</div> <div>117</div> <div>118</div> <div>119</div>
+                    <div>120</div> <div>121</div> <div>122</div> <div>123</div> <div>124</div> <div>125</div> <div>126</div> <div>127</div>
+                </div>
+            </fieldset>
+
+            <fieldset id="bpmSection" class="gridItem">
+                <legend>bpm</legend>
+                <input min="32" max="256" type="number" value="120"></input>
+            </fieldset>
+
+            <fieldset id="keybindingsSection" class="gridItem">
+                <legend>key bindings</legend>
+                <div id="keybindingsSectionGrid"></div>
+            </fieldset>
+
         </div>
 
     </body>

@@ -42,7 +42,6 @@ export const TimeDivision = {
     THIRTY_SECOND_NOTE: 8.0,
 };
 
-
 // struct of note data, non-specific to whether it's a note on or off
 class Note {
     constructor(pitch = 60, velocity = 96, channel = 0) {
@@ -67,7 +66,6 @@ class Note {
 
     // ---------------------------------------------------------------- public
 
-
     toNoteOnMidiBytesArray() {
         return this.toMidiBytesArray(true);
     }
@@ -80,7 +78,6 @@ class Note {
         return (this.pitch === other.pitch) && (this.channel == other.channel);
     }
 }
-
 
 // represents stream of note on/off events for a (single) midi pitch/channel
 // if duration in milliseconds <= 0, then you'll need to explicitly release()
@@ -172,8 +169,6 @@ class NoteEvent {
 
 }
 
-
-
 // an engine which triggers midi events on some MIDIOutput device and channel
 // it has built in note effects:
 //     arpeggiation and delay (which run in that order)
@@ -195,7 +190,7 @@ export default class Engine {
         // gate time for the arpeggiator
         this.arpeggiatorGateTimeInMilliseconds =
             this.calculateDurationInMilliseconds(
-                0.7 * TimeDivision.QUARTER_NOTE, this.BPM);
+                0.75 * TimeDivision.QUARTER_NOTE, this.BPM);
         // ticker to trigger arpeggiator
         this.arpeggiatorTicker = new Ticker(
             this.calculateTickRate(
@@ -458,10 +453,10 @@ export default class Engine {
             percentage * arpeggiatorTickDurationInMilliseconds;
     }
 
-    // sets the # of repeats in the delay effect, may be 0 to 8 where 0 means
-    // delay effect is off and greater than 8 is ignored
+    // sets the # of repeats in the delay effect, may be 0 to 9 where 0 means
+    // delay effect is off and greater than 9 is ignored
     setDelayRepeats(numberOfRepeats) {
-        this.delayRepeats = Math.max(0, Math.min(numberOfRepeats, 8));
+        this.delayRepeats = Math.max(0, Math.min(numberOfRepeats, 9));
     }
 
     // sets delay time relative to the BPM in time divisions
@@ -469,7 +464,6 @@ export default class Engine {
         this.delayTimeInMilliseconds =
             this.calculateDurationInMilliseconds(timeDivision, this.BPM);
     }
-
 
     // release every note event
     releaseEverything() {
@@ -482,6 +476,7 @@ export default class Engine {
 
     // send death wall
     hailMary() {
+        this.releaseEverything();
         let messages = [];
         for (let channel = 0; channel < 16; ++channel) {
             for (pitch = 0; pitch < 128; ++pitch) {
