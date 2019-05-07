@@ -109,6 +109,11 @@ class NoteEvent {
     // NOTA BENE this only works on midi byte arrays of length 3 that is,
     // midi note on and note off messages.  It will blow up otherwise.
     sendThroughDelay(midiBytesArray) {
+        // there's a chance that the engine changes its internal reference to
+        // the midi output, in which case our timeouts will send notes to the
+        // wrong midi output incurring sticky notes, so we fetch a reference to
+        // it now
+        let midiOutput = this.midiOutput;
         // for the number of repeats, set a timeout to trigger our events
         // with decaying velocity (to simulate a delay effect)
         for (let i = 1; i <= this.delayRepeats; ++i) {
@@ -119,7 +124,7 @@ class NoteEvent {
                 // sending a note off event through a note on with 0 velocity
                 let reducedVelocity = Math.max(1, velocity -
                     Math.floor(velocity * reductionFactor));
-                this.midiOutput.send([statusByte, pitch, reducedVelocity]);
+                midiOutput.send([statusByte, pitch, reducedVelocity]);
             }, i * this.delayTimeInMilliseconds);
         }
     }
@@ -159,9 +164,10 @@ class NoteEvent {
         }
     }
 
-    // gets a note struct object {pitch, velocity, channel}
+    // gets a (copied) note struct object {pitch, velocity, channel}
     getNote() {
-        return this.note;
+        return Object.assign(Object.create(Object.getPrototypeOf(this.note)),
+            this.note);
     }
 
 }
@@ -174,24 +180,30 @@ class NoteEvent {
 export default class Engine {
 
     constructor(midiOutput) {
+        // where to send midi data
         this.midiOutput = midiOutput;
-        //
-        this.noteEvents = []; // which notes are currently pressed/activated
-        //
-        this.BPM = 120; // <--- for use in synchronizing the arpeggiator/delay
-        //
+        // which note events are active (currently pressed)
+        this.noteEvents = [];
+        // BPM (used for synchronizing the arpeggiator / delay)
+        this.BPM = 120;
+        // arpeggiator mode
         this.arpeggiatorMode = ArpeggiatorMode.OFF;
-        this.arpeggiatorNoteSequence = []; // <--- note sequence the arpeggiator runs through
-        this.arpeggiatorNoteSequenceIndex = 0; // <--- arpeggiator note to play
+        // sequence of notes the arpeggiator rolls through
+        this.arpeggiatorNoteSequence = [];
+        // which index in our arpeggiator note sequence is playing
+        this.arpeggiatorNoteSequenceIndex = 0;
+        // gate time for the arpeggiator
         this.arpeggiatorGateTimeInMilliseconds =
             this.calculateDurationInMilliseconds(
                 0.7 * TimeDivision.QUARTER_NOTE, this.BPM);
+        // ticker to trigger arpeggiator
         this.arpeggiatorTicker = new Ticker(
             this.calculateTickRate(
                 TimeDivision.QUARTER_NOTE, this.BPM)); // when to arpeggiate notes
         this.arpeggiatorTicker.setCallback(this.arpeggiatorTick.bind(this));
-        //
+        // how many delay repeats
         this.delayRepeats = 0;
+        // how much delay time
         this.delayTimeInMilliseconds = this.calculateDelayTimeInMilliseconds(
             this.BPM, TimeDivision.QUARTER_NOTE_DOTTED);
     }
@@ -217,15 +229,16 @@ export default class Engine {
                 Math.floor(Math.random() * this.arpeggiatorNoteSequence.length);
         } else {
             this.arpeggiatorNoteSequenceIndex =
-                (this.arpeggiatorNoteSequenceIndex + 1) % this.arpeggiatorNoteSequence.length;
+                (this.arpeggiatorNoteSequenceIndex + 1) %
+                this.arpeggiatorNoteSequence.length;
         }
         let note = this.arpeggiatorNoteSequence[this.arpeggiatorNoteSequenceIndex];
         // acquire how long to fire it
         let durationInMilliseconds = this.arpeggiatorGateTimeInMilliseconds;
-        // fire it
-        let noteEvent = new NoteEvent(note, durationInMilliseconds,
-            this.delayRepeats, this.delayTimeInMilliseconds, this.midiOutput);
-        noteEvent.attack(); // <--- will release because duration specified
+        // fire it (will release automatically because duration specified)
+        (new NoteEvent(note, durationInMilliseconds,
+            this.delayRepeats, this.delayTimeInMilliseconds,
+            this.midiOutput)).attack();
     }
 
     // updates the arpeggiator sequence according to
@@ -451,21 +464,43 @@ export default class Engine {
         this.delayRepeats = Math.max(0, Math.min(numberOfRepeats, 8));
     }
 
-    // sets when the delays should trigger
+    // sets delay time relative to the BPM in time divisions
     setDelayTime(timeDivision) {
         this.delayTimeInMilliseconds =
             this.calculateDurationInMilliseconds(timeDivision, this.BPM);
     }
 
+
+    // release every note event
+    releaseEverything() {
+        for (let i = 0; i < this.noteEvents.length; ++i) {
+            let noteEvent = this.noteEvents.pop();
+            noteEvent.release();
+        }
+        this.updateArpeggiatorSequence();
+    }
+
+    // send death wall
+    hailMary() {
+        let messages = [];
+        for (let channel = 0; channel < 16; ++channel) {
+            for (pitch = 0; pitch < 128; ++pitch) {
+                messages.push([0b10000000 | channel, pitch, 64]);
+            }
+        }
+        this.midiOutput.send(messages);
+    }
+
     // sets the midi output (where midi data is sent)
     setMidiOutput(midiOutput) {
-        //TODO
         // we have to shutdown *everything* before we change the midi output
         // otherwise this could cause a sticky note (note off never sent)
+        this.releaseEverything();
+        this.midiOutput = midiOutput;
     }
 
     // sets a callback to trigger when midi events are sent to the midi output
     setOnMidiEventSent(callback) {
-
+        //TODO
     }
 }
