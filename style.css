@@ -1,0 +1,129 @@
+/******************** css vars
+*/
+
+:root {
+    /* use like so: var(--color-name); */
+    --background-color: #777;
+    --highlight-color: #773;
+    --foreground-color-dark: #eee;
+    --foreground-color-light: #eee;
+    --border-color: yellow;
+    --font-size: 1vw;
+    --gap-size: 30px;
+    --border-size: 2px;
+}
+
+/******************** global settings
+*/
+
+* {
+    /* include padding/border in a content box width/height */
+    box-sizing: border-box;
+    /* turn off margins */
+    margin: 0;
+    /* cuz we edgy */
+    font-family: 'Roboto Mono', monospace;
+    font-size: var(--font-size);
+    line-height: 1em;
+    /* selecting text prohibited */
+    user-select: none;
+}
+
+/******************** grid
+*/
+
+#gridWrapper {
+    /* turn on grid display */
+    display: grid;
+    /* see this for discussion of the fr unit */
+    /* https://css-tricks.com/introduction-fr-css-unit/ */
+    grid-template-columns: 20% 30% 10% 10% 20%;
+    grid-template-rows: 10% 30% 30% 20% 10%;
+    width: 100vw;
+    height: 100vh;
+    background: var(--background-color);
+    padding: var(--gap-size);
+    grid-gap: var(--gap-size);
+}
+
+.gridItem {
+    border: var(--border-size) solid var(--border-color);
+    padding: var(--gap-size);
+}
+
+/******************** select elements
+*/
+
+select {
+    background-color: inherit;
+    color: inherit;
+    width: 100%;
+}
+
+select option {
+    /* I don't know why, but a value of "inherit" doesn't correctly inherit color*/
+    background-color: var(--background-color);
+}
+
+select option:hover {
+    color: red;
+    background-color: red;
+}
+
+/******************** keyboardLayoutSelectSection
+*/
+
+#keyboardLayoutSelectSection {
+    grid-column: 1;
+    grid-row: 2 / 4;
+}
+
+#keyboardLayoutSelect {}
+
+/******************** arpeggiatorSection
+*/
+
+#arpeggiatorSection {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+#arpeggiatorSection>div {}
+
+/******************** arpeggiatorSection
+*/
+
+#arpeggiatorSection {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+#arpeggiatorSection>div {}
+
+/******************** delaySection
+*/
+
+#delaySection {
+    grid-column: 2;
+    grid-row: 3;
+}
+
+/******************** eventLogSection
+*/
+
+#eventLogSection {
+    grid-column: 3 / 5;
+    grid-row: 2 / 4;
+}
+
+#eventLog {}
+
+/******************** deviceSelect
+*/
+
+#deviceSelectSection {
+    grid-column: 5;
+    grid-row: 2 / 4;
+}
+
+#deviceSelect {}
