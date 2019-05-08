@@ -1,7 +1,7 @@
-import Ticker from "./ticker.js"
+// import Ticker from "./ticker.js"
 
 // "enum" for arpeggiator modes
-export const ArpeggiatorMode = {
+const ArpeggiatorMode = {
     OFF: 0,
     UP: 1,
     DOWN: 2,
@@ -16,7 +16,7 @@ export const ArpeggiatorMode = {
 
 // "enum" for time divisions
 //  with carefully chosen values to simplify arpeggiator time division calculation
-export const TimeDivision = {
+const TimeDivision = {
 
     // 4/4 time signature
 
@@ -59,9 +59,9 @@ class Note {
     // a note on or off (as specified in argument) array of midi bytes
     toMidiBytesArray(isNoteOn) {
         // create status byte
-        let statusByte = (isNoteOn ? 0b10010000 : 0b10000000) | channel;
+        let statusByte = (isNoteOn ? 0b10010000 : 0b10000000) | this.channel;
         // and return the midi bytes array
-        return [statusByte, pitch, velocity];
+        return [statusByte, this.pitch, this.velocity];
     }
 
     // ---------------------------------------------------------------- public
@@ -77,6 +77,11 @@ class Note {
     equals(other) {
         return (this.pitch === other.pitch) && (this.channel == other.channel);
     }
+
+    // copy this note to a new object
+    copySelf() {
+        return new Note(this.pitch, this.velocity, this.channel);
+    }
 }
 
 // represents stream of note on/off events for a (single) midi pitch/channel
@@ -86,7 +91,7 @@ class NoteEvent {
     constructor(note, durationInMilliseconds = 0, delayRepeats = 0,
         delayTimeInMilliseconds = 500, midiOutput) {
         // copy the note
-        this.note = Object.assign(Object.create(Object.getPrototypeOf(note)), note);
+        this.note = note.copySelf();
         // where to send the midi bytes
         this.midiOutput = midiOutput;
         // <= 0 : unlimited duration note on (needs a note off later to stop it)
@@ -155,16 +160,15 @@ class NoteEvent {
     release() {
         if (this.releases < this.attacks) {
             let noteOffMidiBytesArray = this.note.toNoteOffMidiBytesArray();
-            this.midiOutput.send(noteOnMidiBytesArray);
-            this.sendThroughDelay(noteOnMidiBytesArray);
+            this.midiOutput.send(noteOffMidiBytesArray);
+            this.sendThroughDelay(noteOffMidiBytesArray);
             this.releases += 1;
         }
     }
 
     // gets a (copied) note struct object {pitch, velocity, channel}
     getNote() {
-        return Object.assign(Object.create(Object.getPrototypeOf(this.note)),
-            this.note);
+        return this.note.copySelf();
     }
 
 }
@@ -172,7 +176,7 @@ class NoteEvent {
 // an engine which triggers midi events on some MIDIOutput device and channel
 // it has built in note effects:
 //     arpeggiation and delay (which run in that order)
-export default class Engine {
+class Engine {
 
     constructor(midiOutput) {
         // where to send midi data
@@ -188,19 +192,18 @@ export default class Engine {
         // which index in our arpeggiator note sequence is playing
         this.arpeggiatorNoteSequenceIndex = 0;
         // gate time for the arpeggiator
-        this.arpeggiatorGateTimeInMilliseconds =
-            this.calculateDurationInMilliseconds(
-                0.75 * TimeDivision.QUARTER_NOTE, this.BPM);
+        this.arpeggiatorGateTimeInMilliseconds = 0.5 *
+            this.calculateDurationInMilliseconds(TimeDivision.EIGHTH_NOTE, this.BPM);
         // ticker to trigger arpeggiator
         this.arpeggiatorTicker = new Ticker(
             this.calculateTickRate(
-                TimeDivision.QUARTER_NOTE, this.BPM)); // when to arpeggiate notes
+                TimeDivision.EIGHTH_NOTE, this.BPM)); // when to arpeggiate notes
         this.arpeggiatorTicker.setCallback(this.arpeggiatorTick.bind(this));
         // how many delay repeats
         this.delayRepeats = 0;
         // how much delay time
-        this.delayTimeInMilliseconds = this.calculateDelayTimeInMilliseconds(
-            this.BPM, TimeDivision.QUARTER_NOTE_DOTTED);
+        this.delayTimeInMilliseconds = this.calculateDurationInMilliseconds(
+            TimeDivision.QUARTER_NOTE_DOTTED, this.BPM);
     }
 
     // --------------------------------------------------------------- private
@@ -231,9 +234,9 @@ export default class Engine {
         // acquire how long to fire it
         let durationInMilliseconds = this.arpeggiatorGateTimeInMilliseconds;
         // fire it (will release automatically because duration specified)
-        (new NoteEvent(note, durationInMilliseconds,
-            this.delayRepeats, this.delayTimeInMilliseconds,
-            this.midiOutput)).attack();
+        let arpeggiatorNoteEvent = new NoteEvent(note, durationInMilliseconds,
+            this.delayRepeats, this.delayTimeInMilliseconds, this.midiOutput);
+        arpeggiatorNoteEvent.attack();
     }
 
     // updates the arpeggiator sequence according to
@@ -242,26 +245,23 @@ export default class Engine {
         // get the notes which are active from the engine's note events
         let arpeggiatorNoteSequence = [];
         for (let i = 0; i < this.noteEvents.length; ++i) {
-            arpeggiatorNoteSequence.push(noteEvent[i].getNote());
+            arpeggiatorNoteSequence.push(this.noteEvents[i].getNote());
         }
-        let s; // temporary sequence variable (sometimes) used below
+        let s = []; // temporary sequence variable (sometimes) used below
 
         switch (this.arpeggiatorMode) {
             case ArpeggiatorMode.OFF:
                 // do nothing
                 break;
             case ArpeggiatorMode.UP:
-                arpeggiatorNoteSequence.sort(
-                    (noteA, noteB) => noteA.pitch - noteB.pitch);
+                arpeggiatorNoteSequence.sort((noteA, noteB) => noteA.pitch - noteB.pitch);
                 break;
             case ArpeggiatorMode.DOWN:
-                arpeggiatorNoteSequence.sort(
-                    (noteA, noteB) => noteB.pitch - noteA.pitch);
+                arpeggiatorNoteSequence.sort((noteA, noteB) => noteB.pitch - noteA.pitch);
                 break;
             case ArpeggiatorMode.UP_DOWN:
-                arpeggiatorNoteSequence.sort(
-                    (noteA, noteB) => noteA.pitch - noteB.pitch);
-                s = [...arpeggiatorNoteSequence];
+                arpeggiatorNoteSequence.sort((noteA, noteB) => noteA.pitch - noteB.pitch);
+                arpeggiatorNoteSequence.forEach(note => s.push(note.copySelf()));
                 s.pop();
                 s.reverse();
                 arpeggiatorNoteSequence.push(...s);
@@ -276,23 +276,21 @@ export default class Engine {
                 // do nothing
                 break;
             case ArpeggiatorMode.RANDOM_2:
-                s = [...arpeggiatorNoteSequence];
+                arpeggiatorNoteSequence.forEach(note => s.push(note.copySelf()));
                 s.forEach(note => note.pitch += 12);
                 arpeggiatorNoteSequence.push(...s);
                 break;
             case ArpeggiatorMode.UP_2:
-                arpeggiatorNoteSequence.sort(
-                    (noteA, noteB) => noteA.pitch - noteB.pitch);
-                s = [...arpeggiatorNoteSequence];
+                arpeggiatorNoteSequence.forEach(note => s.push(note.copySelf()));
                 s.forEach(note => note.pitch += 12);
                 arpeggiatorNoteSequence.push(...s);
+                arpeggiatorNoteSequence.sort((noteA, noteB) => noteA.pitch - noteB.pitch);
                 break;
             case ArpeggiatorMode.DOWN_2:
-                arpeggiatorNoteSequence.sort(
-                    (noteA, noteB) => noteB.pitch - noteA.pitch);
-                s = [...arpeggiatorNoteSequence];
+                arpeggiatorNoteSequence.forEach(note => s.push(note.copySelf()));
                 s.forEach(note => note.pitch += 12);
-                arpeggiatorNoteSequence.unshift(...s);
+                arpeggiatorNoteSequence.push(...s);
+                arpeggiatorNoteSequence.sort((noteA, noteB) => noteB.pitch - noteA.pitch);
                 break;
         }
         this.arpeggiatorNoteSequence = arpeggiatorNoteSequence;
@@ -301,6 +299,11 @@ export default class Engine {
     // ---------------------------------------------------------------- public
 
     noteOn(pitch, velocity = 96, channel = 0) {
+
+        // check that some pitch was passed in and return otherwise
+        if (isNaN(pitch) || (typeof(pitch) !== "number")) {
+            return;
+        }
 
         // create a note object
         let note = new Note(pitch, velocity, channel);
@@ -331,10 +334,14 @@ export default class Engine {
             // start the arpeggiator ticker (which fires its own note events)
             this.arpeggiatorTicker.start() // will not restart if already on
         }
-
     }
 
     noteOff(pitch, velocity = 0, channel = 0) {
+
+        // check that some pitch was passed in and return otherwise
+        if (isNaN(pitch) || (typeof(pitch) !== "number")) {
+            return;
+        }
 
         // create a note object
         let note = new Note(pitch, velocity, channel);
@@ -359,12 +366,12 @@ export default class Engine {
             noteEvent.release();
         } else {
             // else arpeggiation is active
+            this.updateArpeggiatorSequence();
             // stop arpeggiator ticker if there are no remaining note events
             if (this.noteEvents.length == 0) {
                 this.arpeggiatorTicker.stop();
-            } else {
-                // else update the arpeggiator sequence
-                this.updateArpeggiatorSequence();
+                // reset arpeggiator note sequence index
+                this.arpeggiatorNoteSequenceIndex = 0;
             }
         }
     }
@@ -394,6 +401,8 @@ export default class Engine {
             // if we're turning the arpeggiator from on to off
             // stop the arpeggiator ticker
             this.arpeggiatorTicker.stop();
+            // reset arpeggiator note sequence index
+            this.arpeggiatorNoteSequenceIndex = 0;
             // and turn on existing note events
             this.noteEvents.forEach(noteEvent => {
                 noteEvent.attack();
@@ -405,8 +414,10 @@ export default class Engine {
             this.noteEvents.forEach(noteEvent => {
                 noteEvent.release();
             });
-            // start the arpeggiator ticker
-            this.arpeggiatorTicker.start();
+            // start the arpeggiator ticker IF there are note events
+            if (this.noteEvents.length > 0) {
+                this.arpeggiatorTicker.start();
+            }
         }
     }
 
@@ -428,29 +439,21 @@ export default class Engine {
     // set the arpeggiation trigger rate
     setArpeggiatorTimeDivision(timeDivision) {
         // get the existing gate time percentage
-        let arpeggiatorTickDurationInMilliseconds =
-            1000 / this.arpeggiatorTicker.getRate();
-        let arpeggiatorGateTimePercentage =
-            this.arpeggiatorGateTimeInMilliseconds /
-            arpeggiatorTickDurationInMilliseconds;
+        let arpeggiatorTickDurationInMilliseconds = 1000 / this.arpeggiatorTicker.getRate();
+        let arpeggiatorGateTimePercentage = this.arpeggiatorGateTimeInMilliseconds / arpeggiatorTickDurationInMilliseconds;
         // set new gate time (in milliseconds) using the prior gate time
-        this.arpeggiatorGateTimeInMilliseconds =
-            this.calculateDurationInMilliseconds(
-                arpeggiatorGateTimePercentage * timeDivision, this.BPM);
+        this.arpeggiatorGateTimeInMilliseconds = Math.floor(arpeggiatorGateTimePercentage * this.calculateDurationInMilliseconds(timeDivision, this.BPM));
         // set new arpeggiator tick rate
-        this.arpeggiatorTicker.setRate(
-            this.calculateTickRate(timeDivision, this.BPM));
+        this.arpeggiatorTicker.setRate(this.calculateTickRate(timeDivision, this.BPM));
     }
 
-    // set the arpeggiation gate time to 0.1 to 0.9
+    // set the arpeggiation gate time to 0.05 to 0.9
     setArpeggiatorGateTime(percentage) {
         // clamp percentage
-        percentage = Math.max(0.1, Math.min(percentage, 0.9));
+        percentage = Math.max(0.05, Math.min(percentage, 0.9));
         // scale the existing gate time
-        let arpeggiatorTickDurationInMilliseconds =
-            1000 / this.arpeggiatorTicker.getRate();
-        this.arpeggiatorGateTimeInMilliseconds =
-            percentage * arpeggiatorTickDurationInMilliseconds;
+        let arpeggiatorTickDurationInMilliseconds = 1000 / this.arpeggiatorTicker.getRate();
+        this.arpeggiatorGateTimeInMilliseconds = Math.floor(percentage * arpeggiatorTickDurationInMilliseconds);
     }
 
     // sets the # of repeats in the delay effect, may be 0 to 9 where 0 means
@@ -463,6 +466,13 @@ export default class Engine {
     setDelayTime(timeDivision) {
         this.delayTimeInMilliseconds =
             this.calculateDurationInMilliseconds(timeDivision, this.BPM);
+    }
+
+    // sets delay time in milliseconds
+    setDelayTimeInMilliseconds(delayTimeInMilliseconds) {
+        // make sure it's greater than or equal to 0
+        delayTimeInMilliseconds = Math.max(0.0, delayTimeInMilliseconds);
+        this.delayTimeInMilliseconds = delayTimeInMilliseconds;
     }
 
     // release every note event
@@ -479,8 +489,8 @@ export default class Engine {
         this.releaseEverything();
         let messages = [];
         for (let channel = 0; channel < 16; ++channel) {
-            for (pitch = 0; pitch < 128; ++pitch) {
-                messages.push([0b10000000 | channel, pitch, 64]);
+            for (let pitch = 0; pitch < 128; ++pitch) {
+                messages.push(0b10000000 | channel, pitch, 0);
             }
         }
         this.midiOutput.send(messages);

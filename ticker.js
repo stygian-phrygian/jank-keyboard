@@ -1,4 +1,4 @@
-export default class Ticker {
+class Ticker {
     // rate is specified as hz, so rate = 3 = 3hz
     constructor(rate = 1) {
         this.rate = rate;
@@ -43,6 +43,14 @@ export default class Ticker {
 
     start() {
         if (!this.isTicking()) {
+            // setInterval(callback, 1000) will not trigger immediately but wait for
+            // 1000 ms BEFORE executing the callback.  That's unacceptable for
+            // our purposes.  When we call start(), we'd like to the callback
+            // to run RIGHT NOW.
+            // Hence, we call the callback here immediately THEN we also
+            // create a set interval to run it at the scheduled interval in the
+            // future.  Make sense?
+            this.callback();
             this.timerID = setInterval(this.callback, (1 / this.rate) * 1000);
         }
     }
