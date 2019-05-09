@@ -44,6 +44,8 @@ function initialize() {
 
     initializeKeyboardLayoutSelect(keyboardLayouts);
     initializeArpeggiatorGateInput();
+    // initializeArpeggiatorModeButtons();
+    // initializeArpeggiatorTimeDivisionButtons();
     initializeDelayTimeInput();
     initializeDelayRepeatInput();
     initializeBPMInput();
@@ -58,8 +60,9 @@ function initialize() {
 
 function keyPressed(e) {
     let pitch = keyboardLayout[e.key];
-    if (pitch !== undefined) {
-        // if we got a pitch from the layout
+    let notAlreadyPressed = !pressedKeys[e.key];
+    if (pitch && notAlreadyPressed) {
+        // if we got a pitch from the layout and it's not already pressed
         // create a new note and save it in the pressed keys
         let note = new Note(pitch + transpose, midiVelocity, midiChannel);;
         pressedKeys[e.key] = note;
@@ -79,11 +82,11 @@ function keyPressed(e) {
 }
 
 function keyReleased(e) {
-    // try to fetch a corresponding note to release from the pressed keys
-    // ignore otherwise
     let note = pressedKeys[e.key];
-    if (note !== undefined) {
+    if (note) {
+        // if we found a note to release, release then delete it
         engine.noteOff(note.pitch, note.velocity, note.channel);
+        delete pressedKeys[e.key];
     }
 }
 
