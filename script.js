@@ -182,7 +182,6 @@ function initializeChannelSelect() {
     // add a callback to the select element
     selectElement.addEventListener("change", (e) => {
         midiChannel = parseInt(e.target.value);
-        console.log(midiChannel);
     });
     // select first
     selectElement.selectedIndex = 0;
