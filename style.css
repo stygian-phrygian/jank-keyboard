@@ -15,6 +15,8 @@
     --octave-section-border-color: #bbb;
     --program-change-section-border-color: #eeb;
     --hover-color: #ebebeb;
+    --selected-color: #ebebeb;
+    --unselected-color: inherit;
     --font-size: 1vw;
     --gap-size: 30px;
     --border-size: 2px;
@@ -33,6 +35,7 @@
     font-size: var(--font-size);
     /* selecting text prohibited */
     user-select: none;
+    outline: none;
 }
 
 /******************** grid
@@ -58,7 +61,7 @@
     /* text-align: center; */
 }
 
-/******************** select elements
+/******************** elements
 */
 
 select {
@@ -71,9 +74,6 @@ select option {
     /* I don't know why, but a value of "inherit" doesn't correctly inherit color*/
     background-color: var(--background-color);
 }
-
-/******************** input elements
-*/
 
 input {
     background-color: inherit;
@@ -90,6 +90,18 @@ label {
     text-align: right;
 }
 
+button {
+    background-color: inherit;
+    border: none;
+    text-align: center;
+    display: inline-block;
+    padding: calc(0.15*var(--gap-size));
+    text-align: left;
+}
+
+button:hover {
+    background-color: var(--hover-color);
+}
 
 /******************** grid items
 */
@@ -126,12 +138,6 @@ label {
     grid-column: 6;
     grid-row: 1;
     border-color: var(--octave-section-border-color);
-}
-
-#octaveSectionGrid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: 1fr;
 }
 
 #channelSection {

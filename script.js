@@ -44,11 +44,12 @@ function initialize() {
 
     initializeKeyboardLayoutSelect(keyboardLayouts);
     initializeArpeggiatorGateInput();
-    // initializeArpeggiatorModeButtons();
-    // initializeArpeggiatorTimeDivisionButtons();
+    initializeArpeggiatorTimeDivisionButtons();
+    initializeArpeggiatorModeButtons();
     initializeDelayTimeInput();
     initializeDelayRepeatInput();
     initializeBPMInput();
+    initializeProgramChangeButtons();
     initializeOctaveSelect();
     initializeChannelSelect();
 
@@ -59,12 +60,13 @@ function initialize() {
 }
 
 function keyPressed(e) {
-    let pitch = keyboardLayout[e.key];
-    let notAlreadyPressed = !pressedKeys[e.key];
-    if (pitch && notAlreadyPressed) {
+    let keyNotPressed = pressedKeys[e.key] === undefined;
+    let keyHasPitch = keyboardLayout[e.key] !== undefined;
+    if (keyNotPressed && keyHasPitch) {
         // if we got a pitch from the layout and it's not already pressed
         // create a new note and save it in the pressed keys
-        let note = new Note(pitch + transpose, midiVelocity, midiChannel);;
+        let pitch = keyboardLayout[e.key] + transpose;
+        let note = new Note(pitch, midiVelocity, midiChannel);;
         pressedKeys[e.key] = note;
         // and trigger a note on in our engine
         engine.noteOn(note.pitch, note.velocity, note.channel);
@@ -249,4 +251,126 @@ function initializeDelayRepeatInput() {
     });
     // fire initial event to set it
     inputElement.dispatchEvent(new Event("change"));
+}
+
+function initializeArpeggiatorModeButtons() {
+    let element = document.querySelector("#arpeggiatorModeSection");
+    let buttons = document.querySelectorAll("#arpeggiatorModeSection button");
+    element.addEventListener("click", (e) => {
+        // return if we're not responding to a button
+        if (e.target.tagName.toLowerCase() !== "button") {
+            return;
+        }
+        switch (e.target.id) {
+            case "arpeggiatorOff":
+                engine.setArpeggiatorMode(ArpeggiatorMode.OFF);
+                break;
+            case "arpeggiatorUp":
+                engine.setArpeggiatorMode(ArpeggiatorMode.UP);
+                break;
+            case "arpeggiatorDown":
+                engine.setArpeggiatorMode(ArpeggiatorMode.DOWN);
+                break;
+            case "arpeggiatorUpDown":
+                engine.setArpeggiatorMode(ArpeggiatorMode.UP_DOWN);
+                break;
+            case "arpeggiatorOrder":
+                engine.setArpeggiatorMode(ArpeggiatorMode.ORDER);
+                break;
+            case "arpeggiatorReverse":
+                engine.setArpeggiatorMode(ArpeggiatorMode.REVERSE);
+                break;
+            case "arpeggiatorRandom":
+                engine.setArpeggiatorMode(ArpeggiatorMode.RANDOM);
+                break;
+            case "arpeggiatorRandom2":
+                engine.setArpeggiatorMode(ArpeggiatorMode.RANDOM_2);
+                break;
+            case "arpeggiatorUp2":
+                engine.setArpeggiatorMode(ArpeggiatorMode.UP_2);
+                break;
+            case "arpeggiatorDown2":
+                engine.setArpeggiatorMode(ArpeggiatorMode.DOWN_2);
+                break;
+        };
+
+    });
+}
+
+function initializeArpeggiatorTimeDivisionButtons() {
+    let element = document.querySelector("#arpeggiatorTimeDivisionSection");
+    element.addEventListener("click", (e) => {
+        // return if we're not responding to a button
+        if (e.target.tagName.toLowerCase() !== "button") {
+            return;
+        }
+        switch (e.target.id) {
+            case "wholeNote":
+                engine.setArpeggiatorTimeDivision(TimeDivision.WHOLE_NOTE);
+                break;
+            case "halfNoteDotted":
+                engine.setArpeggiatorTimeDivision(TimeDivision.HALF_NOTE_DOTTED);
+                break;
+            case "halfNote":
+                engine.setArpeggiatorTimeDivision(TimeDivision.HALF_NOTE);
+                break;
+            case "quarterNoteDotted":
+                engine.setArpeggiatorTimeDivision(TimeDivision.QUARTER_NOTE_DOTTED);
+                break;
+            case "quarterNote":
+                engine.setArpeggiatorTimeDivision(TimeDivision.QUARTER_NOTE);
+                break;
+            case "eighthNoteDotted":
+                engine.setArpeggiatorTimeDivision(TimeDivision.EIGHTH_NOTE_DOTTED);
+                break;
+            case "eighthNote":
+                engine.setArpeggiatorTimeDivision(TimeDivision.EIGHTH_NOTE);
+                break;
+            case "sixteenthNoteDotted":
+                engine.setArpeggiatorTimeDivision(TimeDivision.SIXTEENTH_NOTE_DOTTED);
+                break;
+            case "sixteenthNote":
+                engine.setArpeggiatorTimeDivision(TimeDivision.SIXTEENTH_NOTE);
+                break;
+            case "thirtySecondNote":
+                engine.setArpeggiatorTimeDivision(TimeDivision.THIRTY_SECOND_NOTE);
+                break;
+        };
+    });
+}
+
+function initializeProgramChangeButtons() {
+    let element = document.querySelector("#programChangeSection");
+    element.addEventListener("click", (e) => {
+        // return if we're not responding to a button
+        if (e.target.tagName.toLowerCase() !== "button") {
+            return;
+        }
+        // parse the value from this button and return on weird
+        let programChangeValue = parseInt(e.target.innerText);
+        if (programChangeValue == undefined) {
+            return;
+        }
+        // send the message
+        engine.programChange(programChangeValue, midiChannel);
+    });
+}
+
+
+
+//TODO use these to paint the buttons
+function getSelectedColor() {
+    let selectedColor = getComputedStyle(document.body).getPropertyValue("--selected-color");
+    if (selectedColor === "") {
+        return " #ebebeb";
+    }
+    return selectedColor;
+}
+//TODO use these to paint the buttons
+function getUnselectedColor() {
+    let unselectedColor = getComputedStyle(document.body).getPropertyValue("--unselected-color");
+    if (unselectedColor === "") {
+        return " inherit";
+    }
+    return unselectedColor;
 }

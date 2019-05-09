@@ -14,6 +14,73 @@
 //
 const keyboardLayouts = {
 
+    // whole tone scale layout (otherwise known as janko)
+    // columns ascending irregularly (z a q 1 => 0, 1, 12, 13) for chromatic notes
+    // rows ascending in major 2nds
+    //
+    // This has an irregular column ascension to account for the lack of chromatic
+    // coverage present in the whole tone scale.
+    "janko": {
+        // col 1
+        "z": 0,
+        "a": -1,
+        "q": 12,
+        "1": 11,
+        // col 2
+        "x": 2,
+        "s": 1,
+        "w": 14,
+        "2": 13,
+        // col 3
+        "c": 4,
+        "d": 3,
+        "e": 16,
+        "3": 15,
+        // col 4
+        "v": 6,
+        "f": 5,
+        "r": 18,
+        "4": 17,
+        // col 5
+        "b": 8,
+        "g": 7,
+        "t": 20,
+        "5": 19,
+        // col 6
+        "n": 10,
+        "h": 9,
+        "y": 22,
+        "6": 21,
+        // col 7
+        "m": 12,
+        "j": 11,
+        "u": 24,
+        "7": 23,
+        // col 8
+        ",": 14,
+        "k": 13,
+        "i": 26,
+        "8": 25,
+        // col 9
+        ".": 16,
+        "l": 15,
+        "o": 28,
+        "9": 27,
+        // col 10
+        "/": 18,
+        ";": 17,
+        "p": 30,
+        "0": 29,
+        // col 11 (somewhat incomplete)
+        "'": 19,
+        "[": 32,
+        "-": 31,
+        // col 12 (somewhat incomplete)
+        "]": 34,
+        "=": 33,
+    },
+
+
     // melodic layout
     // columns ascending in perfect 4ths
     // rows ascending in major 2nds
@@ -21,7 +88,7 @@ const keyboardLayouts = {
     // This an oddly useful layout, optimized for melodic playing.  The major
     // scale modes are very easily accessible (as well as chromatic should you
     // desire).  Perfect fifths are a comfortable keypress away.
-    "melodicLayout": {
+    "melodic": {
         // col 1
         "z": 0,
         "a": 5,
@@ -85,7 +152,7 @@ const keyboardLayouts = {
     // columns ascending in minor 3rds
     // rows ascending in major 2nds
     //
-    "melodicLayout2": {
+    "melodic vers. 2": {
         // col 1
         "z": 0,
         "a": 3,
@@ -152,7 +219,7 @@ const keyboardLayouts = {
     // This layout has an odd descending note layout in its columns but is useful
     // for harmony.  The right hand has convenient access to 7th chords.  There are
     // no redundant notes (maximizing voicing options).
-    "major3rdsInvertedLayout": {
+    "major 3rds inverted": {
         // col 1
         "z": 3,
         "a": 2,
@@ -215,7 +282,7 @@ const keyboardLayouts = {
     // minor 3rds layout
     // columns ascending in minor 2nds
     // rows    ascending in minor 3rds
-    "minor3rdsLayout": {
+    "minor 3rds": {
         // col 1
         "z": 0,
         "a": 1,
@@ -275,76 +342,10 @@ const keyboardLayouts = {
         "=": 36,
     },
 
-    // whole tone scale layout
-    // columns ascending irregularly (z a q 1 => 0, 1, 12, 13) for chromatic notes
-    // rows ascending in major 2nds
-    //
-    // This has an irregular column ascension to account for the lack of chromatic
-    // coverage present in the whole tone scale.
-    "wholeToneScaleLayout": {
-        // col 1
-        "z": 0,
-        "a": -1,
-        "q": 12,
-        "1": 11,
-        // col 2
-        "x": 2,
-        "s": 1,
-        "w": 14,
-        "2": 13,
-        // col 3
-        "c": 4,
-        "d": 3,
-        "e": 16,
-        "3": 15,
-        // col 4
-        "v": 6,
-        "f": 5,
-        "r": 18,
-        "4": 17,
-        // col 5
-        "b": 8,
-        "g": 7,
-        "t": 20,
-        "5": 19,
-        // col 6
-        "n": 10,
-        "h": 9,
-        "y": 22,
-        "6": 21,
-        // col 7
-        "m": 12,
-        "j": 11,
-        "u": 24,
-        "7": 23,
-        // col 8
-        ",": 14,
-        "k": 13,
-        "i": 26,
-        "8": 25,
-        // col 9
-        ".": 16,
-        "l": 15,
-        "o": 28,
-        "9": 27,
-        // col 10
-        "/": 18,
-        ";": 17,
-        "p": 30,
-        "0": 29,
-        // col 11 (somewhat incomplete)
-        "'": 19,
-        "[": 32,
-        "-": 31,
-        // col 12 (somewhat incomplete)
-        "]": 34,
-        "=": 33,
-    },
-
     // diatonic scale layout
     // columns ascending irregularly (z a q 1 => 0, 1, 12, 13) for chromatic notes
     // rows ascending irregularly in diatonic notes (z,q: white notes & a,1: accidentals)
-    "diatonicLayout": {
+    "diatonic": {
         // col 1
         "z": 0,
         // "a": -1,
@@ -410,7 +411,7 @@ const keyboardLayouts = {
     // rows ascending in minor 2nds
     //
     // This is basically a bass guitar layout.
-    "perfect4thsLayout": {
+    "perfect 4ths": {
         // col 1
         "z": 0,
         "a": 5,
@@ -476,7 +477,7 @@ const keyboardLayouts = {
     //
     // This layout is convenient for its easy access to perfect 5ths as well as
     // being similar to the layout of a guitar.
-    "tritoneLayout": {
+    "tritone": {
         // col 1
         "z": 0,
         "a": 6,

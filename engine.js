@@ -193,11 +193,11 @@ class Engine {
         this.arpeggiatorNoteSequenceIndex = 0;
         // gate time for the arpeggiator
         this.arpeggiatorGateTimeInMilliseconds = 0.5 *
-            this.calculateDurationInMilliseconds(TimeDivision.EIGHTH_NOTE, this.BPM);
+            this.calculateDurationInMilliseconds(TimeDivision.SIXTEENTH_NOTE, this.BPM);
         // ticker to trigger arpeggiator
         this.arpeggiatorTicker = new Ticker(
             this.calculateTickRate(
-                TimeDivision.EIGHTH_NOTE, this.BPM)); // when to arpeggiate notes
+                TimeDivision.SIXTEENTH_NOTE, this.BPM)); // when to arpeggiate notes
         this.arpeggiatorTicker.setCallback(this.arpeggiatorTick.bind(this));
         // how many delay repeats
         this.delayRepeats = 0;
@@ -433,6 +433,10 @@ class Engine {
         this.arpeggiatorTicker.setRate(this.arpeggiatorTicker.getRate() / r);
         this.arpeggiatorGateTimeInMilliseconds *= r;
         this.delayTimeInMilliseconds *= r;
+    }
+
+    getBPM() {
+        return this.BPM;
     }
 
 
