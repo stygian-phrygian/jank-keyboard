@@ -4,10 +4,17 @@
 :root {
     /* use like so: var(--color-name); */
     --background-color: #777;
-    --highlight-color: #773;
-    --foreground-color-dark: #eee;
-    --foreground-color-light: #eee;
-    --border-color: yellow;
+    --border-color: #eeb;
+    --arpeggiator-section-border-color: #ebe;
+    --delay-section-border-color: #bbe;
+    --bpm-section-border-color: #bbb;
+    --keybindings-section-border-color: #beb;
+    --keyboard-layout-select-section-border-color: #beb;
+    --device-select-section-border-color: #bee;
+    --channel-select-section-border-color: #eeb;
+    --octave-section-border-color: #bbb;
+    --program-change-section-border-color: #eeb;
+    --hover-color: #ebebeb;
     --font-size: 1vw;
     --gap-size: 30px;
     --border-size: 2px;
@@ -65,11 +72,6 @@ select option {
     background-color: var(--background-color);
 }
 
-select option:hover {
-    color: red;
-    background-color: red;
-}
-
 /******************** input elements
 */
 
@@ -77,11 +79,15 @@ input {
     background-color: inherit;
     color: inherit;
     width: 100%;
-    text-align: right;
 }
 
-input:hover {
-    background-color: var(--highlight-color);
+input[type=number] {
+    text-align: center;
+}
+
+label {
+    display: block;
+    text-align: right;
 }
 
 
@@ -90,18 +96,21 @@ input:hover {
 
 #bpmSection {
     grid-column: 1;
-    grid-row: 1;
+    grid-row: 3;
+    border-color: var(--bpm-section-border-color);
 }
 
 
 #keyboardLayoutSelectSection {
     grid-column: 3 / 5;
     grid-row: 1 / 4;
+    border-color: var(--keyboard-layout-select-section-border-color);
 }
 
 #keybindingsSection  {
     grid-column: 1 /3;
     grid-row: 4 / -1;
+    border-color: var(--keybindings-section-border-color);
 }
 #keybindingsSectionGrid {
     grid-template-columns: repeat(2, 1fr);
@@ -110,11 +119,13 @@ input:hover {
 #deviceSelectSection {
     grid-column: 3 / 5;
     grid-row: 4 / -1;
+    border-color: var(--device-select-section-border-color);
 }
 
 #octaveSection {
     grid-column: 6;
     grid-row: 1;
+    border-color: var(--octave-section-border-color);
 }
 
 #octaveSectionGrid {
@@ -126,52 +137,54 @@ input:hover {
 #channelSection {
     grid-column: 5;
     grid-row: 1;
+    border-color: var(--channel-select-section-border-color);
 }
-#channelSectionGrid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(4, 1fr);
+
+.arpeggiatorSection {
+    border-color: var(--arpeggiator-section-border-color);
 }
 
 #arpeggiatorModeSection {
     grid-column: 1;
-    grid-row: 2;
+    grid-row: 1;
 }
 
 #arpeggiatorModeSectionGrid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+}
+
+#arpeggiatorModeSectionGrid > div:hover {
+    background: var(--hover-color);
 }
 
 #arpeggiatorTimeDivisionSection {
-    grid-column: 2;
-    grid-row: 1;
+    grid-column: 1;
+    grid-row: 2;
 }
 
 #arpeggiatorTimeDivisionSectionGrid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
 }
+
+#arpeggiatorTimeDivisionSectionGrid > div:hover {
+    background: var(--hover-color);
+}
+
 #arpeggiatorGateSection {
-    grid-column: 1;
-    grid-row: 3;
+    grid-column: 2;
+    grid-row: 1;
 }
 
-#arpeggiatorGateSectionGrid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: 1fr;
+.delaySection {
+    border-color: var(--delay-section-border-color);
 }
 
-#delayTimeDivisionSection {
+#delayTimeSection {
     grid-column: 2;
     grid-row: 2;
-}
-
-#delayTimeDivisionSectionGrid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: 1fr;
 }
 
 #delayRepeatSection{
@@ -179,20 +192,19 @@ input:hover {
     grid-row: 3;
 }
 
-#delayRepeatSectionGrid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: 1fr;
-}
-
 #programChangeSection{
     grid-column: 5 / 7;
     grid-row: 2 / 7;
+    border-color: var(--program-change-section-border-color);
 }
 
 #programChangeSectionGrid {
     display: grid;
     grid-template-columns: repeat(8, 1fr);
     grid-template-rows: repeat(16, 1fr);
+}
+
+#programChangeSectionGrid > div:hover {
+    background: var(--hover-color);
 }
 

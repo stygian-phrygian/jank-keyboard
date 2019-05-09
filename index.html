@@ -25,38 +25,38 @@
 
             <fieldset id="octaveSection" class="gridItem">
                 <legend>octave</legend>
-                <div id="octaveSectionGrid">
-                    <div>01</div>
-                    <div>02</div>
-                    <div>03</div>
-                    <div>04</div>
-                </div>
+                <select>
+                    <option>00</option>
+                    <option>01</option>
+                    <option>02</option>
+                    <option>03</option>
+                </select>
             </fieldset>
 
 
             <fieldset id="channelSection" class="gridItem">
                 <legend>channel</legend>
-                <div id="channelSectionGrid">
-                    <div>00</div>
-                    <div>01</div>
-                    <div>02</div>
-                    <div>03</div>
-                    <div>04</div>
-                    <div>05</div>
-                    <div>06</div>
-                    <div>07</div>
-                    <div>08</div>
-                    <div>09</div>
-                    <div>10</div>
-                    <div>11</div>
-                    <div>12</div>
-                    <div>13</div>
-                    <div>14</div>
-                    <div>15</div>
-                </div>
+                <select id="channelSelect">
+                    <option>00</option>
+                    <option>01</option>
+                    <option>02</option>
+                    <option>03</option>
+                    <option>04</option>
+                    <option>05</option>
+                    <option>06</option>
+                    <option>07</option>
+                    <option>08</option>
+                    <option>09</option>
+                    <option>10</option>
+                    <option>11</option>
+                    <option>12</option>
+                    <option>13</option>
+                    <option>14</option>
+                    <option>15</option>
+                </select>
             </fieldset>
 
-            <fieldset id="arpeggiatorModeSection" class="gridItem">
+            <fieldset id="arpeggiatorModeSection" class="arpeggiatorSection gridItem">
                 <legend>arp mode</legend>
                 <div id="arpeggiatorModeSectionGrid">
                     <div id="arpeggiatorNone">off</div>
@@ -72,7 +72,7 @@
                 </div>
             </fieldset>
 
-            <fieldset id="arpeggiatorTimeDivisionSection" class="gridItem">
+            <fieldset id="arpeggiatorTimeDivisionSection" class="arpeggiatorSection gridItem">
                 <legend>arp clock</legend>
                 <div id="arpeggiatorTimeDivisionSectionGrid">
                     <div id="wholeNote">01</div>
@@ -88,47 +88,39 @@
                 </div>
             </fieldset>
 
-            <fieldset id="arpeggiatorGateSection" class="gridItem">
-                <legend>arp gate</legend>
-                <div id="arpeggiatorGateSectionGrid">
-                    <div id="arpeggiatorGate10Percent">10%</div>
-                    <div id="arpeggiatorGate25Percent">25%</div>
-                    <div id="arpeggiatorGate50Percent">50%</div>
-                    <div id="arpeggiatorGate75Percent">75%</div>
-                    <div id="arpeggiatorGate90Percent">90%</div>
-                </div>
+            <fieldset id="arpeggiatorGateSection" class="arpeggiatorSection gridItem">
+                <legend>arp gate time</legend>
+                <label for="arpeggiatorGate"></label>
+                <input type="range"
+                       name="arpeggiatorGate"
+                       min="0.1"
+                       max="0.9"
+                       step="0.1"
+                       value="0.5"
+                       >
             </fieldset>
 
-            <fieldset id="delayTimeDivisionSection" class="gridItem">
-                <legend>delay clock</legend>
-                <div id="delayTimeDivisionSectionGrid">
-                    <div id="wholeNote">01</div>
-                    <div id="halfNoteDotted">02.</div>
-                    <div id="halfNote">02</div>
-                    <div id="quarterNoteDotted">04.</div>
-                    <div id="quarterNote">04</div>
-                    <div id="eighthNoteDotted">08.</div>
-                    <div id="eighthNote">08</div>
-                    <div id="sixteenthNoteDotted">16.</div>
-                    <div id="sixteenthNote">16</div>
-                    <div id="thirtySecondNote">32</div>
-                </div>
+            <fieldset id="delayTimeSection" class="delaySection gridItem">
+                <legend>delay time</legend>
+                <label for="delayTimeInMilliseconds">750ms</label>
+                <input type="range"
+                       name="delayTimeInMilliseconds"
+                       min="50"
+                       max="2000"
+                       value="750"
+                       step="20"
+                       >
             </fieldset>
 
-            <fieldset id="delayRepeatSection" class="gridItem">
+            <fieldset id="delayRepeatSection" class="delaySection gridItem">
                 <legend>delay repeat</legend>
-                <div id="delayRepeatSectionGrid">
-                <div>00</div>
-                <div>01</div>
-                <div>02</div>
-                <div>03</div>
-                <div>04</div>
-                <div>05</div>
-                <div>06</div>
-                <div>07</div>
-                <div>08</div>
-                <div>09</div>
-                </div>
+                <label for="delayRepeats">0</label>
+                <input type="range"
+                       name="delayRepeats"
+                       min="0"
+                       max="9"
+                       value="0"
+                       >
             </fieldset>
 
             <fieldset id="programChangeSection" class="gridItem">
