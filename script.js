@@ -42,6 +42,7 @@ function initialize() {
         navigator.requestMIDIAccess().then(midiAccessSuccess, midiAccessFailure);
     }
 
+    initializeLogging();
     initializeKeyboardLayoutSelect(keyboardLayouts);
     initializeArpeggiatorGateInput();
     initializeArpeggiatorTimeDivisionButtons();
@@ -93,28 +94,32 @@ function keyReleased(e) {
 }
 
 
-// callback: on midi access successfully acquired /////////////////////////////
+// on midi access successfully acquired
 function midiAccessSuccess(midiAccess) {
     // save reference to midi access
     midiAccess = midiAccess;
     // save reference to first midi output (which our callbacks will send data through)
     // this is a hacky... method to get the first value of the outputs map (works on ubuntu at least)
     midiOutput = midiAccess.outputs.get(midiAccess.outputs.keys().next().value);
-    // create a new engine
-    engine = new Engine(midiOutput);
-    // initialize device select UI (to display the available midi outputs)
-    initializeDeviceSelect(midiAccess);
+    // initialize devices select UI (to display the available midi input/output
+    initializeDevicesSelect(midiAccess);
 }
 
-// callback: on midi access unsuccessfully acquired ///////////////////////////
+// on midi access unsuccessfully acquired
 function midiAccessFailure() {
     console.error("Could not initialize midi")
 }
 
-// populate midi devices on UI, select a device, hook a change callback to our select element
-function initializeDeviceSelect(midiAccess) {
-    let selectElement = document.querySelector("#deviceSelect");
-    // for each entry in available midi output ports
+// populate midi devices on UI, select a default output device
+// hook a change callback to our select elements
+function initializeDevicesSelect(midiAccess) {
+    initializeOutputDeviceSelect(midiAccess);
+    initializeInputDeviceSelect(midiAccess);
+}
+
+function initializeOutputDeviceSelect(midiAccess) {
+    let selectElement = document.querySelector("#outputDeviceSelect");
+    // for each entry in available midi output
     for (var entry of midiAccess.outputs) {
         // append an option to our device select element
         let output = entry[1];
@@ -139,6 +144,18 @@ function initializeDeviceSelect(midiAccess) {
     selectElement.dispatchEvent(new Event("change"));
 }
 
+function initializeInputDeviceSelect(midiAccess) {
+    let selectElement = document.querySelector("#inputDeviceSelect");
+    // for each entry in available midi intputs
+    for (var entry of midiAccess.inputs) {
+        // append an option to our device select element
+        let input = entry[1];
+        let option = document.createElement("option");
+        option.text = input.name;
+        selectElement.add(option);
+    }
+}
+
 // populate keyboard layouts on UI, select a layout, hook a change callback to our select element
 function initializeKeyboardLayoutSelect(keyboardLayouts) {
     let selectElement = document.querySelector("#keyboardLayoutSelect");
@@ -155,6 +172,24 @@ function initializeKeyboardLayoutSelect(keyboardLayouts) {
     // pick a default option
     selectElement.selectedIndex = 0;
     selectElement.dispatchEvent(new Event("change"));
+}
+
+// attach a callback to the engine which watches midi traffic
+function initializeLogging() {
+    let element = document.querySelector("#log");
+    // arbitrarily chosen number of logging lines
+    let numberOfLoggingLines = 18;
+    let loggingLines = new Array(numberOfLoggingLines);
+    engine.setLoggingCallback((midiBytesArray) => {
+        // convert the midi bytes into a string suitable for display
+        let line = midiBytesArray.map(b => b.toString().padStart(2, "0")).join(" ");
+        // out with the old and in with the new
+        loggingLines.unshift(line);
+        loggingLines.pop();
+        // display
+        element.innerHTML = loggingLines.join("</br>");
+    });
+    console.log(engine);
 }
 
 function initializeOctaveSelect() {
