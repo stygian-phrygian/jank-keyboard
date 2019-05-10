@@ -1,5 +1,3 @@
-// import Ticker from "./ticker.js"
-
 // "enum" for arpeggiator modes
 const ArpeggiatorMode = {
     OFF: 0,
@@ -204,6 +202,8 @@ class Engine {
         // how much delay time
         this.delayTimeInMilliseconds = this.calculateDurationInMilliseconds(
             TimeDivision.QUARTER_NOTE_DOTTED, this.BPM);
+        // finally set a dummy logging callback until it is set by enduser
+        this.loggingCallback = () => {};
     }
 
     // --------------------------------------------------------------- private
@@ -264,6 +264,7 @@ class Engine {
                 arpeggiatorNoteSequence.forEach(note => s.push(note.copySelf()));
                 s.pop();
                 s.reverse();
+                s.pop();
                 arpeggiatorNoteSequence.push(...s);
                 break;
             case ArpeggiatorMode.ORDER:
@@ -508,8 +509,9 @@ class Engine {
         this.midiOutput = midiOutput;
     }
 
-    // sets a callback to trigger when midi events are sent to the midi output
-    setOnMidiEventSent(callback) {
-        //TODO
+    // sets a callback to trigger when midi messages are sent out
+    // intended as a logging mechanism
+    setLoggingCallback(callback) {
+        this.loggingCallback = callback;
     }
 }
