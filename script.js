@@ -19,6 +19,11 @@ let midiOutput = {
         console.error("Midi is unavailable");
     }
 };
+// where to receive notes (if it's not from computer keyboard)
+// initialized to dummy
+let midiInput = {
+    data: []
+};
 // which channel to send events over
 let midiChannel = 0;
 // which velocity to send
@@ -154,6 +159,45 @@ function initializeInputDeviceSelect(midiAccess) {
         option.text = input.name;
         selectElement.add(option);
     }
+    // register a change callback for this device select element
+    selectElement.addEventListener("change", (e) => {
+        // remove old midi input's handler
+        midiInput.onmidimessage = undefined;
+        // find the new midi input and register our handler there
+        let selectedMidiInputName = e.target.value;
+        for (let entry of midiAccess.inputs) {
+            let input = entry[1];
+            if (input.name == selectedMidiInputName) {
+                input.onmidimessage = midiInputCallback;
+                midiInput = input;
+            }
+        }
+    });
+    // pick a default midi output
+    selectElement.selectedIndex = "0";
+    selectElement.dispatchEvent(new Event("change"));
+}
+
+// hand off input midi messages into the engine
+// IT SHOULD BE NOTED, when the midi input device is the same as the midi
+// output device (names match) input midi messages will not go through.
+// It creates a feedback loop. I did this. You really don't want to do this.
+function midiInputCallback(midiMessage) {
+    if (midiInput.name == engine.midiOutput.name) {
+        return;
+    }
+    let channel = midiMessage.data[0] & 0xf;
+    switch (midiMessage.data[0] >> 4) {
+        case 0x9: // note on
+            engine.noteOn(midiMessage.data[1], midiMessage.data[2], channel);
+            break;
+        case 0x8: // note off
+            engine.noteOff(midiMessage.data[1], midiMessage.data[2], channel);
+            break;
+        case 0xc: // program change
+            engine.programChange(midiMessage.data[1], channel);
+            break;
+    }
 }
 
 // populate keyboard layouts on UI, select a layout, hook a change callback to our select element
@@ -189,7 +233,6 @@ function initializeLogging() {
         // display
         element.innerHTML = loggingLines.join("</br>");
     });
-    console.log(engine);
 }
 
 function initializeOctaveSelect() {
