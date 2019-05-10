@@ -87,7 +87,7 @@ class Note {
 // the note event to send the requisite note off(s).
 class NoteEvent {
     constructor(note, durationInMilliseconds = 0, delayRepeats = 0,
-        delayTimeInMilliseconds = 500, midiOutput) {
+        delayTimeInMilliseconds = 500, midiOutput, loggingCallback) {
         // copy the note
         this.note = note.copySelf();
         // where to send the midi bytes
@@ -102,8 +102,18 @@ class NoteEvent {
         // releases must always be <=  attacks
         this.attacks = 0;
         this.releases = 0;
+        // executes with midi sent
+        if (loggingCallback == undefined) {
+            this.loggingCallback = () => {};
+        }
+        this.loggingCallback = loggingCallback;
     }
     // --------------------------------------------------------------- private
+    // sends bytes to the midi output and logs them with the logging callback
+    send(midiBytesArray) {
+        this.midiOutput.send(midiBytesArray);
+        this.loggingCallback(midiBytesArray);
+    }
 
     // sends the midi bytes out after delay
     // NOTA BENE this only works on midi byte arrays of length 3 that is,
@@ -124,7 +134,7 @@ class NoteEvent {
                 // sending a note off event through a note on with 0 velocity
                 let reducedVelocity = Math.max(1, velocity -
                     Math.floor(velocity * reductionFactor));
-                midiOutput.send([statusByte, pitch, reducedVelocity]);
+                this.send([statusByte, pitch, reducedVelocity]);
             }, i * this.delayTimeInMilliseconds);
         }
     }
@@ -137,13 +147,13 @@ class NoteEvent {
         if (this.durationInMilliseconds <= 0) {
             // if duration isn't specified
             // send the note on midi bytes
-            this.midiOutput.send(noteOnMidiBytesArray);
+            this.send(noteOnMidiBytesArray);
             this.sendThroughDelay(noteOnMidiBytesArray);
         } else {
             // else a duration is specified
             // send the note on midi bytes &
             // after a timeout the note off midi bytes
-            this.midiOutput.send(noteOnMidiBytesArray);
+            this.send(noteOnMidiBytesArray);
             this.sendThroughDelay(noteOnMidiBytesArray);
             setTimeout(() => {
                 if (this.releases < this.attacks) {
@@ -158,7 +168,7 @@ class NoteEvent {
     release() {
         if (this.releases < this.attacks) {
             let noteOffMidiBytesArray = this.note.toNoteOffMidiBytesArray();
-            this.midiOutput.send(noteOffMidiBytesArray);
+            this.send(noteOffMidiBytesArray);
             this.sendThroughDelay(noteOffMidiBytesArray);
             this.releases += 1;
         }
@@ -235,7 +245,8 @@ class Engine {
         let durationInMilliseconds = this.arpeggiatorGateTimeInMilliseconds;
         // fire it (will release automatically because duration specified)
         let arpeggiatorNoteEvent = new NoteEvent(note, durationInMilliseconds,
-            this.delayRepeats, this.delayTimeInMilliseconds, this.midiOutput);
+            this.delayRepeats, this.delayTimeInMilliseconds, this.midiOutput,
+            this.loggingCallback);
         arpeggiatorNoteEvent.attack();
     }
 
@@ -319,7 +330,8 @@ class Engine {
         // unlimited duration because the duration (and release) is unknown
         let unlimitedDuration = 0;
         let noteEvent = new NoteEvent(note, unlimitedDuration,
-            this.delayRepeats, this.delayTimeInMilliseconds, this.midiOutput);
+            this.delayRepeats, this.delayTimeInMilliseconds, this.midiOutput, 
+            this.loggingCallback);
         this.noteEvents.push(noteEvent);
 
         // determine how to trigger this new note
@@ -385,7 +397,9 @@ class Engine {
         programChangeValue = Math.max(0, Math.min(programChangeValue, 127));
         // bitwise or with the channel to produce the correct status byte
         let statusByte = 0b11000000 | channel;
-        this.midiOutput.send([statusByte, programChangeValue]);
+        let midiBytesArray = [statusByte, programChangeValue];
+        this.midiOutput.send(midiBytesArray);
+        this.loggingCallback(midiBytesArray);
     }
 
     // set the type of arpeggiation
@@ -498,6 +512,7 @@ class Engine {
                 messages.push(0b10000000 | channel, pitch, 0);
             }
         }
+        // should we call the logging callback here to log this nuke?
         this.midiOutput.send(messages);
     }
 
