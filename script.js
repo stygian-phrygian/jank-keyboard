@@ -534,8 +534,10 @@ function initializeProgramChangeButtons() {
 function selectAndUnselectButtons(selectedButton, unselectedButton) {
     if (unselectedButton) {
         unselectedButton.style.border = "";
+        unselectedButton.style.background = "";
     }
     if (selectedButton) {
         selectedButton.style.border = "var(--selected-border)";
+        selectedButton.style.background = "var(--selected-background-color)";
     }
 }
