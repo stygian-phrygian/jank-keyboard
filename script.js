@@ -338,7 +338,7 @@ function initializeDelayRepeatInput() {
 
 function initializeArpeggiatorModeButtons() {
     let element = document.querySelector("#arpeggiatorModeSection");
-    let buttons = document.querySelectorAll("#arpeggiatorModeSection button");
+    let lastSelectedButton = document.querySelector("#arpeggiatorOff");
     element.addEventListener("click", (e) => {
         // return if we're not responding to a button
         if (e.target.tagName.toLowerCase() !== "button") {
@@ -376,12 +376,17 @@ function initializeArpeggiatorModeButtons() {
                 engine.setArpeggiatorMode(ArpeggiatorMode.DOWN_2);
                 break;
         };
-
+        // update button style
+        selectAndUnselectButtons(e.target, lastSelectedButton);
+        lastSelectedButton = e.target;
     });
+    // select the default button
+    lastSelectedButton.click();
 }
 
 function initializeArpeggiatorTimeDivisionButtons() {
     let element = document.querySelector("#arpeggiatorTimeDivisionSection");
+    let lastSelectedButton = document.querySelector("#sixteenthNote");
     element.addEventListener("click", (e) => {
         // return if we're not responding to a button
         if (e.target.tagName.toLowerCase() !== "button") {
@@ -419,11 +424,17 @@ function initializeArpeggiatorTimeDivisionButtons() {
                 engine.setArpeggiatorTimeDivision(TimeDivision.THIRTY_SECOND_NOTE);
                 break;
         };
+        // update button style
+        selectAndUnselectButtons(e.target, lastSelectedButton);
+        lastSelectedButton = e.target;
     });
+    // select the default button
+    lastSelectedButton.click();
 }
 
 function initializeProgramChangeButtons() {
     let element = document.querySelector("#programChangeSection");
+    let lastSelectedButton;
     element.addEventListener("click", (e) => {
         // return if we're not responding to a button
         if (e.target.tagName.toLowerCase() !== "button") {
@@ -436,24 +447,21 @@ function initializeProgramChangeButtons() {
         }
         // send the message
         engine.programChange(programChangeValue, midiChannel);
+        // update button style
+        selectAndUnselectButtons(e.target, lastSelectedButton);
+        lastSelectedButton = e.target;
     });
 }
 
-
-
-//TODO use these to paint the buttons
-function getSelectedColor() {
-    let selectedColor = getComputedStyle(document.body).getPropertyValue("--selected-color");
-    if (selectedColor === "") {
-        return " #ebebeb";
+// selects and unselects two buttons
+// if only the 1st button is specified, it just selects it
+// this is only meant to be used as a helper function for components which
+// track which button was just clicked and which was last clicked
+function selectAndUnselectButtons(selectedButton, unselectedButton) {
+    if (unselectedButton) {
+        unselectedButton.style.border = "";
     }
-    return selectedColor;
-}
-//TODO use these to paint the buttons
-function getUnselectedColor() {
-    let unselectedColor = getComputedStyle(document.body).getPropertyValue("--unselected-color");
-    if (unselectedColor === "") {
-        return " inherit";
+    if (selectedButton) {
+        selectedButton.style.border = "var(--selected-border)";
     }
-    return unselectedColor;
 }

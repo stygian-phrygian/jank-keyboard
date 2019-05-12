@@ -17,8 +17,7 @@
     --program-change-section-border-color: #eeb;
     --latch-section-border-color: #eee;
     --hover-color: #ebebeb;
-    --selected-border-color: black;
-    --unselected-border-color: inherit;
+    --selected-border: 1px black solid;
     --font-size: 1vw;
     --gap-size: 1vw;
     --border-size: 2px;
@@ -96,8 +95,7 @@ label {
 button {
     background-color: inherit;
     border: none;
-    display: inline-block;
-    text-align: left;
+    text-align: center;
 }
 
 button:hover {
@@ -219,5 +217,5 @@ button:hover {
 #programChangeSectionGrid {
     display: grid;
     grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: repeat(16, 1fr);
+    /* grid-template-rows: repeat(16, mixmax(0, 1fr)); */
 }
