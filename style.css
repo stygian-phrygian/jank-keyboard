@@ -17,8 +17,8 @@
     --program-change-section-border-color: #eeb;
     --latch-section-border-color: #eee;
     --hover-color: #ebebeb;
-    --selected-color: #ebebeb;
-    --unselected-color: inherit;
+    --selected-border-color: black;
+    --unselected-border-color: inherit;
     --font-size: 1vw;
     --gap-size: 1vw;
     --border-size: 2px;
