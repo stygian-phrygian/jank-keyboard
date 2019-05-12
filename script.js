@@ -66,6 +66,8 @@ function initialize() {
 }
 
 function keyPressed(e) {
+    e.preventDefault();
+
     let keyNotPressed = pressedKeys[e.key] === undefined;
     let keyHasPitch = keyboardLayout[e.key] !== undefined;
     if (keyNotPressed && keyHasPitch) {
