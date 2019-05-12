@@ -87,6 +87,62 @@ function keyPressed(e) {
             engine.hailMary();
             break;
     }
+
+    if (e.altKey) {
+        switch (e.key) {
+            case "ArrowUp":
+                // increase gate time
+                break;
+            case "ArrowDown":
+                // decrease gate time
+                break;
+            case "ArrowRight":
+                // next arp type
+                document.querySelector("#arpeggiatorModeSection").dispatchEvent(
+                    new Event("next"));
+                break;
+            case "ArrowLeft":
+                // previous arp type
+                document.querySelector("#arpeggiatorModeSection").dispatchEvent(
+                    new Event("previous"));
+                break;
+        }
+    }
+
+    if (e.shiftKey) {
+        switch (e.key) {
+            case "ArrowUp":
+                // increase delay time
+                break;
+            case "ArrowDown":
+                // decrease delay time
+                break;
+            case "ArrowRight":
+                // increase delay repeats
+                break;
+            case "ArrowLeft":
+                // decrease delay repeats
+                break;
+        }
+    }
+
+    if (e.ctrlKey) {
+        switch (e.key) {
+            case "ArrowUp":
+                // increase layout
+                break;
+            case "ArrowDown":
+                // decrease layout
+                break;
+            case "ArrowRight":
+                // increase channel
+                break;
+            case "ArrowLeft":
+                // decrease channel
+                break;
+        }
+    }
+
 }
 
 function keyReleased(e) {
@@ -338,7 +394,9 @@ function initializeDelayRepeatInput() {
 
 function initializeArpeggiatorModeButtons() {
     let element = document.querySelector("#arpeggiatorModeSection");
-    let lastSelectedButton = document.querySelector("#arpeggiatorOff");
+    let buttons = Array.from(document.querySelectorAll("#arpeggiatorModeSection button"));
+    let lastSelectedButtonIndex = buttons.findIndex((b) => b.id === "arpeggiatorOff");
+    // handle button click events
     element.addEventListener("click", (e) => {
         // return if we're not responding to a button
         if (e.target.tagName.toLowerCase() !== "button") {
@@ -377,11 +435,25 @@ function initializeArpeggiatorModeButtons() {
                 break;
         };
         // update button style
-        selectAndUnselectButtons(e.target, lastSelectedButton);
-        lastSelectedButton = e.target;
+        selectAndUnselectButtons(e.target, buttons[lastSelectedButtonIndex]);
+        lastSelectedButtonIndex = buttons.findIndex(b => b.id === e.target.id);
     });
     // select the default button
-    lastSelectedButton.click();
+    buttons[lastSelectedButtonIndex].click();
+
+    // handle next event
+    element.addEventListener("next", (e) => {
+        let i = (lastSelectedButtonIndex + 1) % buttons.length;
+        buttons[i].click();
+    });
+
+    // handle previous event
+    element.addEventListener("previous", (e) => {
+        let i = (lastSelectedButtonIndex > 0) ?
+            ((lastSelectedButtonIndex - 1) % buttons.length) :
+            buttons.length - 1;
+        buttons[i].click();
+    });
 }
 
 function initializeArpeggiatorTimeDivisionButtons() {
