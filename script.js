@@ -222,7 +222,7 @@ function initializeKeyboardLayoutSelect(keyboardLayouts) {
 function initializeLogging() {
     let element = document.querySelector("#log");
     // arbitrarily chosen number of logging lines
-    let numberOfLoggingLines = 18;
+    let numberOfLoggingLines = 64;
     let loggingLines = new Array(numberOfLoggingLines);
     engine.setLoggingCallback((midiBytesArray) => {
         // convert the midi bytes into a string suitable for display
