@@ -151,13 +151,15 @@ function initializeOutputDeviceSelect(midiAccess) {
 
 function initializeInputDeviceSelect(midiAccess) {
     let selectElement = document.querySelector("#inputDeviceSelect");
-    // for each entry in available midi intputs
+    let numberOfInputs = 0;
+    // for each entry in available midi inputs
     for (var entry of midiAccess.inputs) {
         // append an option to our device select element
         let input = entry[1];
         let option = document.createElement("option");
         option.text = input.name;
         selectElement.add(option);
+        numberOfInputs += 1;
     }
     // register a change callback for this device select element
     selectElement.addEventListener("change", (e) => {
@@ -173,8 +175,12 @@ function initializeInputDeviceSelect(midiAccess) {
             }
         }
     });
-    // pick a default midi output
-    selectElement.selectedIndex = "0";
+    // pick a default midi input, preferably different than the output
+    if (numberOfInputs > 1) {
+        selectElement.selectedIndex = "1";
+    } else {
+        selectElement.selectedIndex = "0";
+    }
     selectElement.dispatchEvent(new Event("change"));
 }
 
