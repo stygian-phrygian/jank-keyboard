@@ -9,3 +9,5 @@ Turn your computer keyboard into a MIDI keyboard.
 * Play with the arpeggiator and delay
 * Type on your keyboard to trigger and release midi notes
 
+## TODO
+* add latch functionality
