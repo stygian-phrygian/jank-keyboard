@@ -330,7 +330,7 @@ class Engine {
         // unlimited duration because the duration (and release) is unknown
         let unlimitedDuration = 0;
         let noteEvent = new NoteEvent(note, unlimitedDuration,
-            this.delayRepeats, this.delayTimeInMilliseconds, this.midiOutput, 
+            this.delayRepeats, this.delayTimeInMilliseconds, this.midiOutput,
             this.loggingCallback);
         this.noteEvents.push(noteEvent);
 
@@ -492,6 +492,15 @@ class Engine {
         // make sure it's greater than or equal to 0
         delayTimeInMilliseconds = Math.max(0.0, delayTimeInMilliseconds);
         this.delayTimeInMilliseconds = delayTimeInMilliseconds;
+    }
+
+    //TODO
+    setLatch(latchOn) {
+        if (latchOn) {
+            // TODO
+        } else {
+            // TODO
+        }
     }
 
     // release every note event

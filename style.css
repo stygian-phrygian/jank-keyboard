@@ -21,6 +21,7 @@
     --latch-section-border-color: #eee;
     --hover-color: #ebebeb;
     --selected-border: var(--border-size) black solid;
+    --selected-background-color: #bbb;
 }
 
 /******************** global settings
