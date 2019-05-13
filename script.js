@@ -132,9 +132,13 @@ function keyPressed(e) {
         switch (e.key) {
             case "ArrowUp":
                 // increase layout
+                document.querySelector("#keyboardLayoutSelect").dispatchEvent(
+                    new Event("next"));
                 break;
             case "ArrowDown":
                 // decrease layout
+                document.querySelector("#keyboardLayoutSelect").dispatchEvent(
+                    new Event("previous"));
                 break;
             case "ArrowRight":
                 // increase channel
@@ -267,11 +271,13 @@ function midiInputCallback(midiMessage) {
 // populate keyboard layouts on UI, select a layout, hook a change callback to our select element
 function initializeKeyboardLayoutSelect(keyboardLayouts) {
     let selectElement = document.querySelector("#keyboardLayoutSelect");
+    let numberOfLayouts = 0;
     // create layout name options for our keyboard layout select element
     Object.keys(keyboardLayouts).forEach(keyboardLayoutName => {
         let option = document.createElement("option");
         option.text = keyboardLayoutName;
         selectElement.add(option);
+        numberOfLayouts += 1;
     });
     // attach a callback for changes
     selectElement.addEventListener("change", (e) => {
@@ -280,6 +286,20 @@ function initializeKeyboardLayoutSelect(keyboardLayouts) {
     // pick a default option
     selectElement.selectedIndex = 0;
     selectElement.dispatchEvent(new Event("change"));
+
+    // attach callbacks for next and previous events
+    selectElement.addEventListener("next", (e) => {
+        selectElement.selectedIndex = (selectElement.selectedIndex + 1) % numberOfLayouts;
+        selectElement.dispatchEvent(new Event("change"));
+    });
+    selectElement.addEventListener("previous", (e) => {
+        if (selectElement.selectedIndex > 0) {
+            selectElement.selectedIndex -= 1;
+        } else {
+            selectElement.selectedIndex = numberOfLayouts - 1;
+        }
+        selectElement.dispatchEvent(new Event("change"));
+    });
 }
 
 // attach a callback to the engine which watches midi traffic
