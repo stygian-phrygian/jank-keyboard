@@ -18,6 +18,7 @@ Turn your computer keyboard into a MIDI keyboard.
     letter/numbers       => MIDI note on/off
     ctrl-down/ctrl-up    => keyboard layout down/up
     alt-left/alt-right   => Arpeggiator Mode left/right
+    alt-down/alt-up      => Arpeggiator Gate decrease/increase
     backspace/delete     => turn off all notes (if notes get stuck)
     escape               => note off wall
 ```

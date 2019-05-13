@@ -94,9 +94,13 @@ function keyPressed(e) {
         switch (e.key) {
             case "ArrowUp":
                 // increase gate time
+                document.querySelector("#arpeggiatorGateSection").dispatchEvent(
+                    new Event("next"));
                 break;
             case "ArrowDown":
                 // decrease gate time
+                document.querySelector("#arpeggiatorGateSection").dispatchEvent(
+                    new Event("previous"));
                 break;
             case "ArrowRight":
                 // next arp type
@@ -380,6 +384,16 @@ function initializeArpeggiatorGateInput() {
     });
     // fire initial event to set it
     inputElement.dispatchEvent(new Event("change"));
+    // register more previous next event callbacks on this section
+    element = document.querySelector("#arpeggiatorGateSection");
+    element.addEventListener("next", (e) => {
+        inputElement.value = parseFloat(inputElement.value) + parseFloat(inputElement.step)
+        inputElement.dispatchEvent(new Event("change"));
+    });
+    element.addEventListener("previous", (e) => {
+        inputElement.value = parseFloat(inputElement.value) - parseFloat(inputElement.step)
+        inputElement.dispatchEvent(new Event("change"));
+    });
 }
 
 function initializeDelayTimeInput() {
