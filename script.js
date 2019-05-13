@@ -82,7 +82,7 @@ function keyPressed(e) {
 
     // other possible key behavior here
     switch (e.key) {
-        case "Backspace":
+        case "Backspace", "Delete":
             engine.releaseEverything();
             break;
         case "Escape":
@@ -131,14 +131,14 @@ function keyPressed(e) {
     if (e.ctrlKey) {
         switch (e.key) {
             case "ArrowUp":
-                // increase layout
-                document.querySelector("#keyboardLayoutSelect").dispatchEvent(
-                    new Event("next"));
-                break;
-            case "ArrowDown":
-                // decrease layout
+                // next layout
                 document.querySelector("#keyboardLayoutSelect").dispatchEvent(
                     new Event("previous"));
+                break;
+            case "ArrowDown":
+                // previous layout
+                document.querySelector("#keyboardLayoutSelect").dispatchEvent(
+                    new Event("next"));
                 break;
             case "ArrowRight":
                 // increase channel

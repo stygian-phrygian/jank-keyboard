@@ -11,3 +11,13 @@ Turn your computer keyboard into a MIDI keyboard.
 
 ## TODO
 * add latch functionality
+* add keybindings
+
+## Keybindings
+```
+    letter/numbers       => MIDI note on/off
+    ctrl-down/ctrl-up    => keyboard layout down/up
+    alt-left/alt-right   => Arpeggiator Mode left/right
+    backspace/delete     => turn off all notes (if notes get stuck)
+    escape               => note off wall
+```
