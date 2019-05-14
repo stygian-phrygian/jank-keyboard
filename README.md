@@ -9,10 +9,6 @@ Turn your computer keyboard into a MIDI keyboard.
 * Play with the arpeggiator and delay
 * Type on your keyboard to trigger and release midi notes
 
-## TODO
-* add latch functionality
-* add keybindings
-
 ## Keybindings
 ```
     letter/numbers       => MIDI note on/off
@@ -20,5 +16,13 @@ Turn your computer keyboard into a MIDI keyboard.
     alt-left/alt-right   => Arpeggiator Mode left/right
     alt-down/alt-up      => Arpeggiator Gate decrease/increase
     backspace/delete     => turn off all notes (if notes get stuck)
-    escape               => note off wall
+    escape               => note off avalanche
 ```
+
+## Screenshot
+![screenshot](screenshot.png)
+
+## TODO
+* add latch functionality
+
+
