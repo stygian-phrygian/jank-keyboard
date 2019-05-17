@@ -86,15 +86,12 @@ class Note {
 // if duration in milliseconds <= 0, then you'll need to explicitly release()
 // the note event to send the requisite note off(s).
 class NoteEvent {
-    constructor(note, durationInMilliseconds = 0, delayRepeats = 0,
-        delayTimeInMilliseconds = 500, midiOutput, loggingCallback) {
+    constructor(note, delayRepeats = 0, delayTimeInMilliseconds = 500,
+        midiOutput, loggingCallback) {
         // copy the note
         this.note = note.copySelf();
         // where to send the midi bytes
         this.midiOutput = midiOutput;
-        // <= 0 : unlimited duration note on (needs a note off later to stop it)
-        // >  0 : limited duration note on/off pair
-        this.durationInMilliseconds = durationInMilliseconds;
         // number of delay repeats and delay time
         this.delayRepeats = delayRepeats;
         this.delayTimeInMilliseconds = delayTimeInMilliseconds;
@@ -110,66 +107,54 @@ class NoteEvent {
     }
     // --------------------------------------------------------------- private
     // sends bytes to the midi output and logs them with the logging callback
-    send(midiBytesArray) {
-        this.midiOutput.send(midiBytesArray);
-        this.loggingCallback(midiBytesArray);
-    }
-
-    // sends the midi bytes out after delay
-    // NOTA BENE this only works on midi byte arrays of length 3 that is,
-    // midi note on and note off messages.  It will blow up otherwise.
-    sendThroughDelay(midiBytesArray) {
-        // there's a chance that the engine changes its internal reference to
-        // the midi output, in which case our timeouts will send notes to the
-        // wrong midi output incurring sticky notes, so we fetch a reference to
-        // it now
-        let midiOutput = this.midiOutput;
-        // for the number of repeats, set a timeout to trigger our events
+    // https://www.w3.org/TR/webmidi/#midioutput-interface
+    send(midiBytesArray, startTimeInMilliseconds = 0) {
+        let now = performance.now();
+        let when = now + startTimeInMilliseconds;
+        this.midiOutput.send(midiBytesArray, when);
+        this.loggingCallback(midiBytesArray, when);
+        // for the number of (delay) repeats, trigger our delayed midi events
         // with decaying velocity (to simulate a delay effect)
+        let [statusByte, pitch, velocity] = midiBytesArray;
         for (let i = 1; i <= this.delayRepeats; ++i) {
-            setTimeout(() => {
-                let [statusByte, pitch, velocity] = midiBytesArray;
-                let reductionFactor = i / (this.delayRepeats + 1);
-                // make sure velocity is at least 1, this way we can avoid
-                // sending a note off event through a note on with 0 velocity
-                let reducedVelocity = Math.max(1, velocity -
-                    Math.floor(velocity * reductionFactor));
-                this.send([statusByte, pitch, reducedVelocity]);
-            }, i * this.delayTimeInMilliseconds);
+            when += this.delayTimeInMilliseconds;
+            let reductionFactor = i / (this.delayRepeats + 1);
+            // make sure velocity is at least 1, this way we can avoid
+            // sending a note off event through a note on with 0 velocity
+            let reducedVelocity = Math.max(1, velocity -
+                Math.floor(velocity * reductionFactor));
+            this.midiOutput.send([statusByte, pitch, reducedVelocity], when);
         }
     }
 
     // ---------------------------------------------------------------- public
-
-    // triggers note on event stream
-    attack() {
+    // triggers a (limited duration) note on/off event stream after startTimeInMilliseconds
+    attackRelease(startTimeInMilliseconds = 0, durationInMilliseconds = 500) {
+        // a duration is specified
+        // send the note on midi bytes & after a timeout the note off midi bytes
         let noteOnMidiBytesArray = this.note.toNoteOnMidiBytesArray();
-        if (this.durationInMilliseconds <= 0) {
-            // if duration isn't specified
-            // send the note on midi bytes
-            this.send(noteOnMidiBytesArray);
-            this.sendThroughDelay(noteOnMidiBytesArray);
-        } else {
-            // else a duration is specified
-            // send the note on midi bytes &
-            // after a timeout the note off midi bytes
-            this.send(noteOnMidiBytesArray);
-            this.sendThroughDelay(noteOnMidiBytesArray);
-            setTimeout(() => {
-                if (this.releases < this.attacks) {
-                    this.release();
-                }
-            }, this.durationInMilliseconds);
-        }
+        let noteOffMidiBytesArray = this.note.toNoteOffMidiBytesArray();
+        this.send(noteOnMidiBytesArray, startTimeInMilliseconds);
+        this.send(noteOffMidiBytesArray, startTimeInMilliseconds + durationInMilliseconds);
+        // there is the potential that the midiOutput.clear() method will be
+        // called in which case the attacks/releases will be inaccurate
+        // reflections of the actual state of note on and off pairs.
+        this.attacks += 1;
+        this.releases += 1;
+    }
+
+    // triggers (unlimited duration) note on (only) event stream after startTimeInMilliseconds
+    attack(startTimeInMilliseconds = 0) {
+        let noteOnMidiBytesArray = this.note.toNoteOnMidiBytesArray();
+        this.send(noteOnMidiBytesArray, startTimeInMilliseconds);
         this.attacks += 1;
     }
 
-    // triggers note off event stream
-    release() {
+    // triggers (unlimited duration) note off (only) event stream after startTimeInMilliseconds
+    release(startTimeInMilliseconds = 0) {
         if (this.releases < this.attacks) {
             let noteOffMidiBytesArray = this.note.toNoteOffMidiBytesArray();
-            this.send(noteOffMidiBytesArray);
-            this.sendThroughDelay(noteOffMidiBytesArray);
+            this.send(noteOffMidiBytesArray, startTimeInMilliseconds);
             this.releases += 1;
         }
     }
@@ -243,11 +228,14 @@ class Engine {
         let note = this.arpeggiatorNoteSequence[this.arpeggiatorNoteSequenceIndex];
         // acquire how long to fire it
         let durationInMilliseconds = this.arpeggiatorGateTimeInMilliseconds;
+        // and when (in this case immediately)
+        let startTimeInMilliseconds = 0;
+        // create it
+        let arpeggiatorNoteEvent =
+            new NoteEvent(note, this.delayRepeats, this.delayTimeInMilliseconds,
+                this.midiOutput, this.loggingCallback);
         // fire it (will release automatically because duration specified)
-        let arpeggiatorNoteEvent = new NoteEvent(note, durationInMilliseconds,
-            this.delayRepeats, this.delayTimeInMilliseconds, this.midiOutput,
-            this.loggingCallback);
-        arpeggiatorNoteEvent.attack();
+        arpeggiatorNoteEvent.attackRelease(startTimeInMilliseconds, durationInMilliseconds);
     }
 
     // updates the arpeggiator sequence according to
@@ -328,10 +316,9 @@ class Engine {
 
         // append a new note event
         // unlimited duration because the duration (and release) is unknown
-        let unlimitedDuration = 0;
-        let noteEvent = new NoteEvent(note, unlimitedDuration,
-            this.delayRepeats, this.delayTimeInMilliseconds, this.midiOutput,
-            this.loggingCallback);
+        let noteEvent = 
+            new NoteEvent(note, this.delayRepeats, this.delayTimeInMilliseconds,
+            this.midiOutput, this.loggingCallback);
         this.noteEvents.push(noteEvent);
 
         // determine how to trigger this new note
