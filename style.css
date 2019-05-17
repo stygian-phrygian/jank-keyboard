@@ -10,7 +10,7 @@
     --gap-size: 1vw;
     --arpeggiator-section-border-color: #ebe;
     --delay-section-border-color: #bbe;
-    --bpm-section-border-color: #eee;
+    --bpm-section-border-color: var(--arpeggiator-section-border-color);
     --logging-section-border-color: #ebb;
     --keyboard-layout-select-section-border-color: #beb;
     --input-device-select-section-border-color: #bee;
