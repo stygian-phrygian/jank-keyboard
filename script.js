@@ -365,7 +365,7 @@ function initializeBPMInput() {
         // We display whatever the engine allowed to occur.
         engine.setBPM(v);
         // update our UI
-        e.target.value = engine.BPM;
+        e.target.value = engine.getBPM();
     });
     // fire initial event to set it
     inputElement.dispatchEvent(new Event("change"));
