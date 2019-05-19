@@ -12,7 +12,7 @@ class StepSequencer {
         this.stepsPerBeat = 4;
         // the bpm, 120 is a good default
         this.bpm = 120;
-        //
+        // calculate step duration from BPM and steps per beat
         this.calculateStepDurationInMilliseconds();
 
         // how long we want each step to attack
@@ -21,14 +21,15 @@ class StepSequencer {
         // how we want to move through the sequence
         this.playbackMode = PlaybackMode.FORWARD;
 
-        // when the sequence started
-        this.startTimeInMilliseconds = 0;
         // how far to lookahead
         this.lookaheadTimeInMilliseconds = 100;
-        // how far we've scheduled up to
-        this.scheduledUpToTimeInMilliseconds = 0;
+        // which step (in multiples of step duration offset when it started)
+        // we're currently at (or have scheduled up to)
+        this.currentStepTimeInMilliseconds = 0;
+        // which step we're currently at, never beyond [0 to length-1]
         this.currentStep = 0;
-        // tick n times per lookahead to avoid jank (arbitrarily chosen)
+
+        // (janky) ticker which schedules (unjankified) events
         let n = 3;
         let rate = 1000 / (this.lookaheadTime / n);
         this.ticker = new Ticker(rate);
@@ -37,25 +38,17 @@ class StepSequencer {
 
     ////////////////////////////////////////////////////////////////// private
 
-    // An explanation of this callback.
-    // Timing things accurately in JS is difficult to say the least if
-    // you're using something like setTimeout() or setInterval().
-    // Highly highly jank.  Fortunately, we have extremely accurate
-    // timestamps utilizing performance.now() to schedule things at
-    // exact moments particularly something like a midi event.  There's
-    // a problem however.  If you're making something like a step
-    // sequencer, you want near realtime feedback, so you can't
-    // schedule too many events which brings you back to the original
-    // problem of innaccuracy.  We must strike a balance.  Therefore,
-    // we choose a lookahead time, say 100ms, which is short enough to
-    // feel responsive, and long enough to allow us a window to queue.
-    // Our setInterval runs N times within that lookahead window,
-    // sidestepping the issue of it janking out randomly, always trying
-    // to schedule a lookahead amount of time ahead.  We don't want
-    // duplicate schedules however, so we keep track of where in time
-    // our sequence of events is, that is, what has already been
-    // scheduled, and increment this with each tick by whatever
-    // lookahead overlaps it by.  Yep, this is confusing.
+    // An explanation of this callback.  Events of midi or audio can be
+    // sequenced highly accurately, but we don't want to sequence too many of
+    // them in the future as this would degrade the user experience (ie. it
+    // wouldn't feel realtime editable anymore).  Hence we choose a lookahead
+    // window which is short enough for the user to not notice, and schedule
+    // from the current scheduled step time to now+lookahead, *then* advance
+    // current scheduled step time by however many steps were scheduled.  This
+    // callback however is JS's admittedly inaccurate timing
+    // mechanism, setInterval/setTimeout, so we call this callback multiple
+    // times per lookahead to avoid jank.
+
     tick() {
 
         // stop ticker (and this callback) if we've stopped playing
@@ -65,7 +58,7 @@ class StepSequencer {
         }
 
         for (
-            // get now and later (which is now + lookahead)
+            // get now, get later (which is now + lookahead)
             let now = performance.now(), later = now + this.lookaheadTimeInMilliseconds;
             // while current step time < later
             this.currentStepTimeInMilliseconds < later;
@@ -113,20 +106,27 @@ class StepSequencer {
 
     // starts the step sequencer (obviously)
     start(offsetStep = 0) {
-        // arbitrarily chosen starting offset time
+        // do nothing if we're already playing
+        if (this.isPlaying) {
+            return;
+        }
+        // otherwise
+        // choose an arbitrary (but user unnoticeable) time from now to start
         let startOffsetInMilliseconds = this.lookaheadTimeInMilliseconds / 2.0;
         let now = performance.now();
         this.currentStepTimeInMilliseconds = now + startOffsetInMilliseconds;
+        // choose which step index we're starting on
         this.currentStep =
             Math.trunc(Math.min(Math.max(0, offsetStep), this.length - 1));
+        // flag that we've entered playback
         this.isPlaying = true;
+        // start the internal scheduling ticker
         this.ticker.start();
     }
 
     // stops the step sequencer (obviously)
     stop() {
-        // ticker will stop itself reading this boolean and clean up the
-        // requisite future scheduled notes
+        // scheduling ticker will stop itself setting this flag
         this.isPlaying = false;
     }
 
