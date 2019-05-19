@@ -144,7 +144,7 @@ class StepSequencer {
     // sets how many steps represent a beat
     // clamped between 1 and 16
     setStepsPerBeat(stepsPerBeat) {
-        this.setStepsPerBeat = Math.trunc(Math.min(Math.max(1, s), 16));
+        this.setStepsPerBeat = Math.trunc(Math.min(Math.max(1, stepsPerBeat), 16));
         this.calculateStepDurationInMilliseconds();
     }
 
