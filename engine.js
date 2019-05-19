@@ -1,6 +1,5 @@
-
-// an engine which triggers midi events on some MIDIOutput device and channel
-// it has built in note effects:
+// an engine which triggers midi events on some MIDIOutput device
+// it has built in midi effects:
 //     arpeggiation and delay (which run in that order)
 class Engine {
 
@@ -17,7 +16,7 @@ class Engine {
         this.delayRepeats = 0;
         // how much delay time
         this.delayTimeInMilliseconds = 500;
-        // finally set a dummy logging callback until it is set by enduser
+        // user set midi logging callback (initialized to an empty callback)
         this.loggingCallback = () => {};
     }
 
@@ -28,9 +27,8 @@ class Engine {
     updateArpeggiatorSequence() {
         // get the notes which are active from the engine's note events
         let arpeggiatorNoteSequence = [];
-        for (let i = 0; i < this.noteEvents.length; ++i) {
-            arpeggiatorNoteSequence.push(this.noteEvents[i].getNote());
-        }
+        this.noteEvents.forEach(
+            noteEvent => arpeggiatorNoteSequence.push(noteEvent.getNote()));
         let s = []; // temporary sequence variable (sometimes) used below
 
         switch (this.arpeggiatorMode) {
@@ -94,30 +92,28 @@ class Engine {
         let note = new Note(pitch, velocity, channel);
 
         // check that this new note isn't already pressed
-        if (this.noteEvents.some(
-                noteEvent => noteEvent.getNote().equals(note))) {
+        if (this.noteEvents.some(noteEvent => noteEvent.getNote().equals(note))) {
             return;
         }
 
         // append a new note event
-        // unlimited duration because the duration (and release) is unknown
-        let noteEvent =
-            new NoteEvent(note, this.delayRepeats, this.delayTimeInMilliseconds,
-                this.midiOutput, this.loggingCallback);
+        let noteEvent = new NoteEvent(
+            note, this.delayRepeats, this.delayTimeInMilliseconds,
+            this.midiOutput, this.loggingCallback);
         this.noteEvents.push(noteEvent);
 
         // determine how to trigger this new note
         if (this.arpeggiatorMode == ArpeggiatorMode.OFF) {
             // if there's no arpeggiation active
             // fire a note on
-            // this will not automatically release as its unlimited duration
+            // this will not automatically release as it's unlimited duration
             noteEvent.attack();
         } else {
             // else arpeggiation is active
             // update the arpeggiator sequence
             this.updateArpeggiatorSequence();
-            // start the arpeggiator ticker (which fires its own note events)
-            this.arpeggiatorTicker.start() // will not restart if already on
+            // start the arpeggiator (which fires its own note events)
+            this.arpeggiatorStepSequencer.start() // will not restart if already on
         }
     }
 
@@ -152,11 +148,9 @@ class Engine {
         } else {
             // else arpeggiation is active
             this.updateArpeggiatorSequence();
-            // stop arpeggiator ticker if there are no remaining note events
+            // if there are no remaining note events, stop the arpeggiator
             if (this.noteEvents.length == 0) {
-                this.arpeggiatorTicker.stop();
-                // reset arpeggiator note sequence index
-                this.arpeggiatorNoteSequenceIndex = 0;
+                this.arpeggiatorStepSequencer.stop();
             }
         }
     }
@@ -186,10 +180,8 @@ class Engine {
         if (oldMode !== ArpeggiatorMode.OFF &&
             newMode === ArpeggiatorMode.OFF) {
             // if we're turning the arpeggiator from on to off
-            // stop the arpeggiator ticker
-            this.arpeggiatorTicker.stop();
-            // reset arpeggiator note sequence index
-            this.arpeggiatorNoteSequenceIndex = 0;
+            // stop the arpeggiator
+            this.arpeggiatorStepSequencer.stop();
             // and turn on existing note events
             this.noteEvents.forEach(noteEvent => {
                 noteEvent.attack();
@@ -201,9 +193,9 @@ class Engine {
             this.noteEvents.forEach(noteEvent => {
                 noteEvent.release();
             });
-            // start the arpeggiator ticker IF there are note events
+            // start the arpeggiator IF there are note events
             if (this.noteEvents.length > 0) {
-                this.arpeggiatorTicker.start();
+                this.arpeggiatorStepSequencer.start();
             }
         }
     }
@@ -219,35 +211,11 @@ class Engine {
 
     // set the arpeggiation trigger rate
     setArpeggiatorTimeDivision(timeDivision) {
-        switch (timeDivision) {
-            case TimeDivision.WHOLE_NOTE: // 16 steps
-                // 1 step per beat
-                break;
-            case TimeDivision.HALF_NOTE_DOTTED: // 12 steps
-                break;
-            case TimeDivision.HALF_NOTE: // 8 steps
-                // 2 steps per beat
-                break;
-            case TimeDivision.QUARTER_NOTE_DOTTED: // 6 steps
-                break;
-            case TimeDivision.QUARTER_NOTE: // 4 steps
-                // 4 steps per beat
-                break;
-            case TimeDivision.EIGHTH_NOTE_DOTTED: // 3 steps
-                break;
-            case TimeDivision.EIGHTH_NOTE: // 2 steps
-                // 2 steps per beat
-                break;
-            case TimeDivision.SIXTEENTH_NOTE_DOTTED: // 1.5 step
-                break;
-            case TimeDivision.SIXTEENTH_NOTE: // 1 step
-                break;
-            case TimeDivision.THIRTY_SECOND_NOTE: // 0.5 step
-                break;
-        }
+        // you better pass in a valid TimeDivision enum value lest explosion
+        this.arpeggiatorStepSequencer.setStepsPerBeat(timeDivision);
     }
 
-    // set the arpeggiation gate time to 0.05 to 0.95
+    // set the arpeggiation gate time
     setArpeggiatorGateTime(percentage) {
         this.arpeggiatorStepSequencer.setGateTime(percentage);
     }

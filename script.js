@@ -1,13 +1,3 @@
-// import {
-//     Engine,
-//     Note
-// } from "./engine.js";
-
-// // which keys trigger which midi pitch (just pitch, not velocity or channel)
-// import {
-//     keyboardLayouts
-// } from "./keyboardLayouts.js";
-
 ///////////////////////////////////////////////////////////////////////////////
 // global variables
 // the entire web midi system's access: https://www.w3.org/TR/webmidi/#idl-def-MIDIAccess
@@ -501,35 +491,20 @@ function initializeArpeggiatorTimeDivisionButtons() {
             return;
         }
         switch (e.target.id) {
-            case "wholeNote":
-                engine.setArpeggiatorTimeDivision(TimeDivision.WHOLE_NOTE);
-                break;
-            case "halfNoteDotted":
-                engine.setArpeggiatorTimeDivision(TimeDivision.HALF_NOTE_DOTTED);
-                break;
-            case "halfNote":
-                engine.setArpeggiatorTimeDivision(TimeDivision.HALF_NOTE);
-                break;
-            case "quarterNoteDotted":
-                engine.setArpeggiatorTimeDivision(TimeDivision.QUARTER_NOTE_DOTTED);
-                break;
             case "quarterNote":
                 engine.setArpeggiatorTimeDivision(TimeDivision.QUARTER_NOTE);
-                break;
-            case "eighthNoteDotted":
-                engine.setArpeggiatorTimeDivision(TimeDivision.EIGHTH_NOTE_DOTTED);
                 break;
             case "eighthNote":
                 engine.setArpeggiatorTimeDivision(TimeDivision.EIGHTH_NOTE);
                 break;
-            case "sixteenthNoteDotted":
-                engine.setArpeggiatorTimeDivision(TimeDivision.SIXTEENTH_NOTE_DOTTED);
-                break;
             case "sixteenthNote":
                 engine.setArpeggiatorTimeDivision(TimeDivision.SIXTEENTH_NOTE);
                 break;
-            case "thirtySecondNote":
-                engine.setArpeggiatorTimeDivision(TimeDivision.THIRTY_SECOND_NOTE);
+            case "eighthNoteTriplet":
+                engine.setArpeggiatorTimeDivision(TimeDivision.EIGHTH_NOTE_TRIPLET);
+                break;
+            case "sixteenthNoteTriplet":
+                engine.setArpeggiatorTimeDivision(TimeDivision.SIXTEENTH_NOTE_TRIPLET);
                 break;
         };
         // update button style
