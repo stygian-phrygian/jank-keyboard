@@ -1,44 +1,4 @@
-// "enum" for arpeggiator modes
-const ArpeggiatorMode = {
-    OFF: 0,
-    UP: 1,
-    DOWN: 2,
-    UP_DOWN: 3,
-    ORDER: 4,
-    REVERSE: 5,
-    RANDOM: 6,
-    RANDOM_2: 7,
-    UP_2: 8,
-    DOWN_2: 9,
-}
 
-// "enum" for time divisions
-//  with carefully chosen values to simplify arpeggiator time division calculation
-const TimeDivision = {
-
-    // 4/4 time signature
-
-    // 16 steps
-    WHOLE_NOTE: 1.0 / 4.0,
-    // 12 steps
-    HALF_NOTE_DOTTED: 1.0 / 3.0,
-    // 8 steps
-    HALF_NOTE: 1.0 / 2.0,
-    // 6 steps
-    QUARTER_NOTE_DOTTED: 2.0 / 3.0,
-    // 4 steps
-    QUARTER_NOTE: 1.0,
-    // 3 steps
-    EIGHTH_NOTE_DOTTED: 4.0 / 3.0,
-    // 2 steps
-    EIGHTH_NOTE: 2.0,
-    // 1.5 step
-    SIXTEENTH_NOTE_DOTTED: 8.0 / 3.0,
-    // 1 step
-    SIXTEENTH_NOTE: 4.0,
-    // 0.5 step
-    THIRTY_SECOND_NOTE: 8.0,
-};
 
 // struct of note data, non-specific to whether it's a note on or off
 class Note {
@@ -108,9 +68,7 @@ class NoteEvent {
     // --------------------------------------------------------------- private
     // sends bytes to the midi output and logs them with the logging callback
     // https://www.w3.org/TR/webmidi/#midioutput-interface
-    send(midiBytesArray, startTimeInMilliseconds = 0) {
-        let now = performance.now();
-        let when = now + startTimeInMilliseconds;
+    send(midiBytesArray, when = 0) {
         this.midiOutput.send(midiBytesArray, when);
         this.loggingCallback(midiBytesArray, when);
         // for the number of (delay) repeats, trigger our delayed midi events
@@ -128,14 +86,14 @@ class NoteEvent {
     }
 
     // ---------------------------------------------------------------- public
-    // triggers a (limited duration) note on/off event stream after startTimeInMilliseconds
-    attackRelease(startTimeInMilliseconds = 0, durationInMilliseconds = 500) {
-        // a duration is specified
-        // send the note on midi bytes & after a timeout the note off midi bytes
+    // triggers a (limited duration) note on/off event stream
+    // with an optional timestamp (see below URL for info on the timestamp)
+    // https://www.w3.org/TR/webmidi/#midioutput-interface
+    attackRelease(durationInMilliseconds = 500, when = 0) {
         let noteOnMidiBytesArray = this.note.toNoteOnMidiBytesArray();
         let noteOffMidiBytesArray = this.note.toNoteOffMidiBytesArray();
-        this.send(noteOnMidiBytesArray, startTimeInMilliseconds);
-        this.send(noteOffMidiBytesArray, startTimeInMilliseconds + durationInMilliseconds);
+        this.send(noteOnMidiBytesArray, when);
+        this.send(noteOffMidiBytesArray, when + durationInMilliseconds);
         // there is the potential that the midiOutput.clear() method will be
         // called in which case the attacks/releases will be inaccurate
         // reflections of the actual state of note on and off pairs.
@@ -143,18 +101,22 @@ class NoteEvent {
         this.releases += 1;
     }
 
-    // triggers (unlimited duration) note on (only) event stream after startTimeInMilliseconds
-    attack(startTimeInMilliseconds = 0) {
+    // triggers (unlimited duration) note on (only) event stream
+    // with an optional timestamp (see below URL for info on the timestamp)
+    // https://www.w3.org/TR/webmidi/#midioutput-interface
+    attack(when = 0) {
         let noteOnMidiBytesArray = this.note.toNoteOnMidiBytesArray();
-        this.send(noteOnMidiBytesArray, startTimeInMilliseconds);
+        this.send(noteOnMidiBytesArray, when);
         this.attacks += 1;
     }
 
     // triggers (unlimited duration) note off (only) event stream after startTimeInMilliseconds
-    release(startTimeInMilliseconds = 0) {
+    // with an optional timestamp (see below URL for info on the timestamp)
+    // https://www.w3.org/TR/webmidi/#midioutput-interface
+    release(when = 0) {
         if (this.releases < this.attacks) {
             let noteOffMidiBytesArray = this.note.toNoteOffMidiBytesArray();
-            this.send(noteOffMidiBytesArray, startTimeInMilliseconds);
+            this.send(noteOffMidiBytesArray, when);
             this.releases += 1;
         }
     }
@@ -176,67 +138,19 @@ class Engine {
         this.midiOutput = midiOutput;
         // which note events are active (currently pressed)
         this.noteEvents = [];
-        // BPM (used for synchronizing the arpeggiator / delay)
-        this.BPM = 120;
         // arpeggiator mode
         this.arpeggiatorMode = ArpeggiatorMode.OFF;
-        // sequence of notes the arpeggiator rolls through
-        this.arpeggiatorNoteSequence = [];
-        // which index in our arpeggiator note sequence is playing
-        this.arpeggiatorNoteSequenceIndex = 0;
-        // gate time for the arpeggiator
-        this.arpeggiatorGateTimeInMilliseconds = 0.5 *
-            this.calculateDurationInMilliseconds(TimeDivision.SIXTEENTH_NOTE, this.BPM);
-        // ticker to trigger arpeggiator
-        this.arpeggiatorTicker = new Ticker(
-            this.calculateTickRate(
-                TimeDivision.SIXTEENTH_NOTE, this.BPM)); // when to arpeggiate notes
-        this.arpeggiatorTicker.setCallback(this.arpeggiatorTick.bind(this));
+        // arpeggiator step sequencer
+        this.arpeggiatorStepSequencer = new StepSequencer();
         // how many delay repeats
         this.delayRepeats = 0;
         // how much delay time
-        this.delayTimeInMilliseconds = this.calculateDurationInMilliseconds(
-            TimeDivision.QUARTER_NOTE_DOTTED, this.BPM);
+        this.delayTimeInMilliseconds = 500;
         // finally set a dummy logging callback until it is set by enduser
         this.loggingCallback = () => {};
     }
 
     // --------------------------------------------------------------- private
-
-    // returns the rate (in hz) of a BPM divided by a time division (assumes 4/4 time)
-    calculateTickRate(timeDivision, BPM) {
-        let beatsPerSecond = BPM / 60.0;
-        return beatsPerSecond * timeDivision;
-    }
-    // returns the duration (in milliseconds) of a time division at a BPM (assumes 4/4 time)
-    calculateDurationInMilliseconds(timeDivision, BPM) {
-        return 1000 / this.calculateTickRate(timeDivision, BPM);
-    }
-
-    // callback which runs with each tick of the arpeggiator to fire notes
-    arpeggiatorTick() {
-        // acquire which note to fire
-        if ((this.arpeggiatorMode === ArpeggiatorMode.RANDOM) ||
-            (this.arpeggiatorMode === ArpeggiatorMode.RANDOM_2)) {
-            this.arpeggiatorNoteSequenceIndex =
-                Math.floor(Math.random() * this.arpeggiatorNoteSequence.length);
-        } else {
-            this.arpeggiatorNoteSequenceIndex =
-                (this.arpeggiatorNoteSequenceIndex + 1) %
-                this.arpeggiatorNoteSequence.length;
-        }
-        let note = this.arpeggiatorNoteSequence[this.arpeggiatorNoteSequenceIndex];
-        // acquire how long to fire it
-        let durationInMilliseconds = this.arpeggiatorGateTimeInMilliseconds;
-        // and when (in this case immediately)
-        let startTimeInMilliseconds = 0;
-        // create it
-        let arpeggiatorNoteEvent =
-            new NoteEvent(note, this.delayRepeats, this.delayTimeInMilliseconds,
-                this.midiOutput, this.loggingCallback);
-        // fire it (will release automatically because duration specified)
-        arpeggiatorNoteEvent.attackRelease(startTimeInMilliseconds, durationInMilliseconds);
-    }
 
     // updates the arpeggiator sequence according to
     // the provided arpeggiator mode and existing note events
@@ -316,9 +230,9 @@ class Engine {
 
         // append a new note event
         // unlimited duration because the duration (and release) is unknown
-        let noteEvent = 
+        let noteEvent =
             new NoteEvent(note, this.delayRepeats, this.delayTimeInMilliseconds,
-            this.midiOutput, this.loggingCallback);
+                this.midiOutput, this.loggingCallback);
         this.noteEvents.push(noteEvent);
 
         // determine how to trigger this new note
@@ -424,54 +338,53 @@ class Engine {
     }
 
     setBPM(bpm) {
-        // clamp bpm
-        bpm = Math.max(32, Math.min(bpm, 256));
-        // we must recalculate all internal timing as it's relative to the BPM
-        // get the ratio of the old to new BPM
-        let r = this.BPM / bpm;
-        // then discard the old
-        this.BPM = bpm;
-        // then recalculate arpeggiator gate time / tick rate, and delay time
-        this.arpeggiatorTicker.setRate(this.arpeggiatorTicker.getRate() / r);
-        this.arpeggiatorGateTimeInMilliseconds *= r;
-        this.delayTimeInMilliseconds *= r;
+        this.arpeggiatorStepSequencer.setBPM(bpm);
     }
 
     getBPM() {
-        return this.BPM;
+        return this.arpeggiatorStepSequencer.getBPM();
     }
 
 
     // set the arpeggiation trigger rate
     setArpeggiatorTimeDivision(timeDivision) {
-        // get the existing gate time percentage
-        let arpeggiatorTickDurationInMilliseconds = 1000 / this.arpeggiatorTicker.getRate();
-        let arpeggiatorGateTimePercentage = this.arpeggiatorGateTimeInMilliseconds / arpeggiatorTickDurationInMilliseconds;
-        // set new gate time (in milliseconds) using the prior gate time
-        this.arpeggiatorGateTimeInMilliseconds = Math.floor(arpeggiatorGateTimePercentage * this.calculateDurationInMilliseconds(timeDivision, this.BPM));
-        // set new arpeggiator tick rate
-        this.arpeggiatorTicker.setRate(this.calculateTickRate(timeDivision, this.BPM));
+        switch (timeDivision) {
+            case TimeDivision.WHOLE_NOTE: // 16 steps
+                // 1 step per beat
+                break;
+            case TimeDivision.HALF_NOTE_DOTTED: // 12 steps
+                break;
+            case TimeDivision.HALF_NOTE: // 8 steps
+                // 2 steps per beat
+                break;
+            case TimeDivision.QUARTER_NOTE_DOTTED: // 6 steps
+                break;
+            case TimeDivision.QUARTER_NOTE: // 4 steps
+                // 4 steps per beat
+                break;
+            case TimeDivision.EIGHTH_NOTE_DOTTED: // 3 steps
+                break;
+            case TimeDivision.EIGHTH_NOTE: // 2 steps
+                // 2 steps per beat
+                break;
+            case TimeDivision.SIXTEENTH_NOTE_DOTTED: // 1.5 step
+                break;
+            case TimeDivision.SIXTEENTH_NOTE: // 1 step
+                break;
+            case TimeDivision.THIRTY_SECOND_NOTE: // 0.5 step
+                break;
+        }
     }
 
-    // set the arpeggiation gate time to 0.05 to 0.9
+    // set the arpeggiation gate time to 0.05 to 0.95
     setArpeggiatorGateTime(percentage) {
-        // clamp percentage
-        percentage = Math.max(0.05, Math.min(percentage, 0.9));
-        // scale the existing gate time
-        let arpeggiatorTickDurationInMilliseconds = 1000 / this.arpeggiatorTicker.getRate();
-        this.arpeggiatorGateTimeInMilliseconds = Math.floor(percentage * arpeggiatorTickDurationInMilliseconds);
+        this.arpeggiatorStepSequencer.setGateTime(percentage);
     }
 
     // sets the # of repeats in the delay effect, may be 0 to 9 where 0 means
     // delay effect is off and greater than 9 is ignored
     setDelayRepeats(numberOfRepeats) {
         this.delayRepeats = Math.max(0, Math.min(numberOfRepeats, 9));
-    }
-
-    // sets delay time relative to the BPM in time divisions
-    setDelayTime(timeDivision) {
-        this.delayTimeInMilliseconds =
-            this.calculateDurationInMilliseconds(timeDivision, this.BPM);
     }
 
     // sets delay time in milliseconds
