@@ -28,7 +28,7 @@ class Engine {
         // get the notes which are active from the engine's note events
         let notes = this.noteEvents.map(noteEvent => noteEvent.getNote());
         let playbackMode = PlaybackMode.FORWARD;
-        // temp variable 
+        // temp variable
         let s = [];
 
         // calculate order of notes to set into the arp step sequence
@@ -104,9 +104,8 @@ class Engine {
         }
 
         // append a new note event
-        let noteEvent = new NoteEvent(
-            note, this.delayRepeats, this.delayTimeInMilliseconds,
-            this.midiOutput, this.loggingCallback);
+        let noteEvent = new NoteEvent(note, this.delayRepeats,
+            this.delayTimeInMilliseconds, this.midiOutput, this.loggingCallback);
         this.noteEvents.push(noteEvent);
 
         // determine how to trigger this new note
