@@ -24,9 +24,9 @@ class NoteEvent {
     // --------------------------------------------------------------- private
     // sends bytes to the midi output and logs them with the logging callback
     // https://www.w3.org/TR/webmidi/#midioutput-interface
-    send(midiBytesArray, when = 0) {
+    send(midiBytesArray, when) {
         this.midiOutput.send(midiBytesArray, when);
-        this.loggingCallback(midiBytesArray, when);
+        this.loggingCallback(midiBytesArray);
         // for the number of (delay) repeats, trigger our delayed midi events
         // with decaying velocity (to simulate a delay effect)
         let [statusByte, pitch, velocity] = midiBytesArray;
@@ -38,6 +38,7 @@ class NoteEvent {
             let reducedVelocity = Math.max(1, velocity -
                 Math.floor(velocity * reductionFactor));
             this.midiOutput.send([statusByte, pitch, reducedVelocity], when);
+            this.loggingCallback([statusByte, pitch, reducedVelocity]);
         }
     }
 
@@ -60,7 +61,10 @@ class NoteEvent {
     // triggers (unlimited duration) note on (only) event stream
     // with an optional timestamp (see below URL for info on the timestamp)
     // https://www.w3.org/TR/webmidi/#midioutput-interface
-    attack(when = 0) {
+    attack(when) {
+        if (when === undefined) {
+            when = performance.now();
+        }
         let noteOnMidiBytesArray = this.note.toNoteOnMidiBytesArray();
         this.send(noteOnMidiBytesArray, when);
         this.attacks += 1;
@@ -69,8 +73,11 @@ class NoteEvent {
     // triggers (unlimited duration) note off (only) event stream after startTimeInMilliseconds
     // with an optional timestamp (see below URL for info on the timestamp)
     // https://www.w3.org/TR/webmidi/#midioutput-interface
-    release(when = 0) {
+    release(when) {
         if (this.releases < this.attacks) {
+            if (when === undefined) {
+                when = performance.now();
+            }
             let noteOffMidiBytesArray = this.note.toNoteOffMidiBytesArray();
             this.send(noteOffMidiBytesArray, when);
             this.releases += 1;
