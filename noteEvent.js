@@ -38,9 +38,9 @@ class NoteEvent {
             let reducedVelocity = Math.max(1, velocity -
                 Math.floor(velocity * reductionFactor));
             this.midiOutput.send([statusByte, pitch, reducedVelocity], when);
-            // nota bene, we can't log the delayed midi bytes in this loop
-            // the midi system can *only* queue midi events accurately
-            // a setTimeout would be inaccurate so we'll forgo logging here
+            // as to why the delayed midi events above cannot be logged
+            // the midi system can *only* queue *midi* events (nothing else)
+            // arbitrary callbacks cannot be timed accurately
         }
     }
 
