@@ -410,6 +410,70 @@ const keyboardLayouts = {
         "=": 36,
     },
 
+
+    // minor 3rds layout vers 2
+    // columns ascending in minor 2nds
+    // rows    ascending in minor 3rds
+    "minor 3rds vers. 2": {
+        // col 1
+        "z": 0,
+        "a": -2,
+        "q": -4,
+        "1": -6,
+        // col 2
+        "x": 3,
+        "s": 1,
+        "w": -1,
+        "2": -3,
+        // col 3
+        "c": 6,
+        "d": 4,
+        "e": 2,
+        "3": 0,
+        // col 4
+        "v": 9,
+        "f": 7,
+        "r": 5,
+        "4": 3,
+        // col 5
+        "b": 12,
+        "g": 10,
+        "t": 8,
+        "5": 6,
+        // col 6
+        "n": 15,
+        "h": 13,
+        "y": 11,
+        "6": 9,
+        // col 7
+        "m": 18,
+        "j": 16,
+        "u": 14,
+        "7": 12,
+        // col 8
+        ",": 21,
+        "k": 19,
+        "i": 17,
+        "8": 15,
+        // col 9
+        ".": 24,
+        "l": 22,
+        "o": 20,
+        "9": 18,
+        // col 10
+        "/": 27,
+        ";": 25,
+        "p": 23,
+        "0": 21,
+        // col 11 (somewhat incomplete)
+        "'": 28,
+        "[": 26,
+        "-": 24,
+        // col 12 (somewhat incomplete)
+        "]": 29,
+        "=": 27,
+    },
+
     // diatonic scale layout
     // columns ascending irregularly (z a q 1 => 0, 1, 12, 13) for chromatic notes
     // rows ascending irregularly in diatonic notes (z,q: white notes & a,1: accidentals)
