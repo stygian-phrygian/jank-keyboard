@@ -143,10 +143,14 @@ function keyPressed(e) {
                     new Event("next"));
                 break;
             case "ArrowRight":
-                // increase channel
+                // increase octave
+                document.querySelector("#octaveSelect").dispatchEvent(
+                    new Event("next"));
                 break;
             case "ArrowLeft":
-                // decrease channel
+                // decrease octave
+                document.querySelector("#octaveSelect").dispatchEvent(
+                    new Event("previous"));
                 break;
         }
     }
@@ -322,7 +326,7 @@ function initializeLogging() {
 }
 
 function initializeOctaveSelect() {
-    let selectElement = document.querySelector("#octaveSection select");
+    let selectElement = document.querySelector("#octaveSelect");
     // add a callback to the select element
     selectElement.addEventListener("change", (e) => {
         // we receive octave 4...
@@ -339,6 +343,20 @@ function initializeOctaveSelect() {
     });
     selectElement.selectedIndex = defaultOption.index;
     selectElement.dispatchEvent(new Event("change"));
+
+    // attach callbacks for next and previous events
+    selectElement.addEventListener("next", (e) => {
+        selectElement.selectedIndex = (selectElement.selectedIndex + 1) % selectElement.length;
+        selectElement.dispatchEvent(new Event("change"));
+    });
+    selectElement.addEventListener("previous", (e) => {
+        if (selectElement.selectedIndex > 0) {
+            selectElement.selectedIndex -= 1;
+        } else {
+            selectElement.selectedIndex = selectElement.length - 1;
+        }
+        selectElement.dispatchEvent(new Event("change"));
+    });
 }
 
 function initializeChannelSelect() {
