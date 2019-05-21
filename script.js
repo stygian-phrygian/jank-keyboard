@@ -109,15 +109,23 @@ function keyPressed(e) {
         switch (e.key) {
             case "ArrowUp":
                 // increase delay time
+                document.querySelector("#delayTimeSection").dispatchEvent(
+                    new Event("next"));
                 break;
             case "ArrowDown":
                 // decrease delay time
+                document.querySelector("#delayTimeSection").dispatchEvent(
+                    new Event("previous"));
                 break;
             case "ArrowRight":
                 // increase delay repeats
+                document.querySelector("#delayRepeatSection").dispatchEvent(
+                    new Event("next"));
                 break;
             case "ArrowLeft":
                 // decrease delay repeats
+                document.querySelector("#delayRepeatSection").dispatchEvent(
+                    new Event("previous"));
                 break;
         }
     }
@@ -399,6 +407,16 @@ function initializeDelayTimeInput() {
     });
     // fire initial event to set it
     inputElement.dispatchEvent(new Event("change"));
+    // register more previous next event callbacks on this section
+    element = document.querySelector("#delayTimeSection");
+    element.addEventListener("next", (e) => {
+        inputElement.value = parseFloat(inputElement.value) + parseFloat(inputElement.step)
+        inputElement.dispatchEvent(new Event("change"));
+    });
+    element.addEventListener("previous", (e) => {
+        inputElement.value = parseFloat(inputElement.value) - parseFloat(inputElement.step)
+        inputElement.dispatchEvent(new Event("change"));
+    });
 }
 
 
@@ -416,6 +434,16 @@ function initializeDelayRepeatInput() {
     });
     // fire initial event to set it
     inputElement.dispatchEvent(new Event("change"));
+    // register more previous next event callbacks on this section
+    element = document.querySelector("#delayRepeatSection");
+    element.addEventListener("next", (e) => {
+        inputElement.value = parseFloat(inputElement.value) + parseFloat(inputElement.step)
+        inputElement.dispatchEvent(new Event("change"));
+    });
+    element.addEventListener("previous", (e) => {
+        inputElement.value = parseFloat(inputElement.value) - parseFloat(inputElement.step)
+        inputElement.dispatchEvent(new Event("change"));
+    });
 }
 
 function initializeArpeggiatorModeButtons() {
