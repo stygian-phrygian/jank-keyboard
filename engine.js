@@ -11,7 +11,7 @@ class Engine {
         // arpeggiator mode
         this.arpeggiatorMode = ArpeggiatorMode.OFF;
         // arpeggiator step sequencer
-        this.arpeggiatorStepSequencer = new StepSequencer();
+        this.arpeggiatorStepSequencer = new StepSequencer(midiOutput);
         // how many delay repeats
         this.delayRepeats = 0;
         // how much delay time
@@ -26,57 +26,64 @@ class Engine {
     // the provided arpeggiator mode and existing note events
     updateArpeggiatorSequence() {
         // get the notes which are active from the engine's note events
-        let arpeggiatorNoteSequence = [];
-        this.noteEvents.forEach(
-            noteEvent => arpeggiatorNoteSequence.push(noteEvent.getNote()));
-        let s = []; // temporary sequence variable (sometimes) used below
+        let notes = this.noteEvents.map(noteEvent => noteEvent.getNote());
+        let playbackMode = PlaybackMode.FORWARD;
+        // temp variable 
+        let s = [];
 
+        // calculate order of notes to set into the arp step sequence
         switch (this.arpeggiatorMode) {
             case ArpeggiatorMode.OFF:
                 // do nothing
                 break;
             case ArpeggiatorMode.UP:
-                arpeggiatorNoteSequence.sort((noteA, noteB) => noteA.pitch - noteB.pitch);
+                notes.sort((noteA, noteB) => noteA.pitch - noteB.pitch);
                 break;
             case ArpeggiatorMode.DOWN:
-                arpeggiatorNoteSequence.sort((noteA, noteB) => noteB.pitch - noteA.pitch);
+                notes.sort((noteA, noteB) => noteB.pitch - noteA.pitch);
                 break;
             case ArpeggiatorMode.UP_DOWN:
-                arpeggiatorNoteSequence.sort((noteA, noteB) => noteA.pitch - noteB.pitch);
-                arpeggiatorNoteSequence.forEach(note => s.push(note.copySelf()));
+                notes.sort((noteA, noteB) => noteA.pitch - noteB.pitch);
+                notes.forEach(note => s.push(note.copySelf()));
                 s.pop();
                 s.reverse();
                 s.pop();
-                arpeggiatorNoteSequence.push(...s);
+                notes.push(...s);
                 break;
             case ArpeggiatorMode.ORDER:
                 // do nothing
                 break;
             case ArpeggiatorMode.REVERSE:
-                arpeggiatorNoteSequence.reverse();
+                notes.reverse();
                 break;
             case ArpeggiatorMode.RANDOM:
-                // do nothing
+                playbackMode = PlaybackMode.RANDOM;
                 break;
             case ArpeggiatorMode.RANDOM_2:
-                arpeggiatorNoteSequence.forEach(note => s.push(note.copySelf()));
+                notes.forEach(note => s.push(note.copySelf()));
                 s.forEach(note => note.pitch += 12);
-                arpeggiatorNoteSequence.push(...s);
+                notes.push(...s);
+                playbackMode = PlaybackMode.RANDOM;
                 break;
             case ArpeggiatorMode.UP_2:
-                arpeggiatorNoteSequence.forEach(note => s.push(note.copySelf()));
+                notes.forEach(note => s.push(note.copySelf()));
                 s.forEach(note => note.pitch += 12);
-                arpeggiatorNoteSequence.push(...s);
-                arpeggiatorNoteSequence.sort((noteA, noteB) => noteA.pitch - noteB.pitch);
+                notes.push(...s);
+                notes.sort((noteA, noteB) => noteA.pitch - noteB.pitch);
                 break;
             case ArpeggiatorMode.DOWN_2:
-                arpeggiatorNoteSequence.forEach(note => s.push(note.copySelf()));
+                notes.forEach(note => s.push(note.copySelf()));
                 s.forEach(note => note.pitch += 12);
-                arpeggiatorNoteSequence.push(...s);
-                arpeggiatorNoteSequence.sort((noteA, noteB) => noteB.pitch - noteA.pitch);
+                notes.push(...s);
+                notes.sort((noteA, noteB) => noteB.pitch - noteA.pitch);
                 break;
         }
-        this.arpeggiatorNoteSequence = arpeggiatorNoteSequence;
+        // set arpeggiator's sequence to conjured notes
+        // and set its playback mode and length
+        let stepIndex = 0;
+        this.arpeggiatorStepSequencer.setSteps(stepIndex, notes);
+        this.arpeggiatorStepSequencer.setPlaybackMode(playbackMode);
+        this.arpeggiatorStepSequencer.setLength(notes.length);
     }
 
     // ---------------------------------------------------------------- public
@@ -224,6 +231,8 @@ class Engine {
     // delay effect is off and greater than 9 is ignored
     setDelayRepeats(numberOfRepeats) {
         this.delayRepeats = Math.max(0, Math.min(numberOfRepeats, 9));
+        // update arpeggiator delay repeats
+        this.arpeggiatorStepSequencer.setDelayRepeats(numberOfRepeats);
     }
 
     // sets delay time in milliseconds
@@ -231,6 +240,8 @@ class Engine {
         // make sure it's greater than or equal to 0
         delayTimeInMilliseconds = Math.max(0.0, delayTimeInMilliseconds);
         this.delayTimeInMilliseconds = delayTimeInMilliseconds;
+        // update arpeggiator delay time
+        this.arpeggiatorStepSequencer.setDelayTimeInMilliseconds(delayTimeInMilliseconds);
     }
 
     //TODO
@@ -270,11 +281,14 @@ class Engine {
         // otherwise this could cause a sticky note (note off never sent)
         this.releaseEverything();
         this.midiOutput = midiOutput;
+        // update the arpeggiator's midi output
+        this.arpeggiatorStepSequencer.setMidiOutput(midiOutput);
     }
 
     // sets a callback to trigger when midi messages are sent out
     // intended as a logging mechanism
     setLoggingCallback(callback) {
         this.loggingCallback = callback;
+        this.arpeggiatorStepSequencer.setLoggingCallback(callback);
     }
 }
