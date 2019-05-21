@@ -1,4 +1,3 @@
-
 // represents stream of note on/off events for a (single) midi pitch/channel
 // if duration in milliseconds <= 0, then you'll need to explicitly release()
 // the note event to send the requisite note off(s).
@@ -84,4 +83,3 @@ class NoteEvent {
     }
 
 }
-
