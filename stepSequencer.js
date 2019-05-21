@@ -1,7 +1,7 @@
 // triggers each step in a step sequence for a step duration of time
 class StepSequencer {
 
-    constructor() {
+    constructor(midiOutput) {
         this.isPlaying = false;
 
         // the actual steps, 128 max for no reason besides industry standards
@@ -15,12 +15,16 @@ class StepSequencer {
         // calculate step duration from BPM and steps per beat
         this.calculateStepDurationInMilliseconds();
 
-        // how long we want each step to attack
-        this.gatePercentage = 0.9;
-
         // how we want to move through the sequence
         this.playbackMode = PlaybackMode.FORWARD;
 
+
+        // logging callback for when midi events occur and we want to log them
+        this.loggingCallback = () => {};
+
+
+        // sequencer specific variables
+        //
         // how far to lookahead
         this.lookaheadTimeInMilliseconds = 100;
         // which step (in multiples of step duration offset when it started)
@@ -28,12 +32,27 @@ class StepSequencer {
         this.currentStepTimeInMilliseconds = 0;
         // which step we're currently at, never beyond [0 to length-1]
         this.currentStep = 0;
-
         // (janky) ticker which schedules (unjankified) events
         let n = 3;
         let rate = 1000 / (this.lookaheadTime / n);
         this.ticker = new Ticker(rate);
         this.ticker.setCallback(this.tick.bind(this));
+
+
+
+
+        // arpeggiator specific variables that could be abstracted out, but for
+        // this application's limited purposes doesn't matter
+        //
+        // how long we want each step to attack
+        this.gatePercentage = 0.9;
+        // where the note events are being sent
+        this.midiOutput = midiOutput;
+        // how many delays on the note events
+        this.delayRepeats = 0;
+        // how long is the delay
+        this.delayTimeInMilliseconds = 500;
+
     }
 
     ////////////////////////////////////////////////////////////////// private
@@ -66,14 +85,17 @@ class StepSequencer {
             this.currentStep = this.nextStep(),
             this.currentStepTimeInMilliseconds += this.stepDurationInMilliseconds
         ) {
-            // schedule a step
-            let stepEvent = this.steps[this.currentStep];
-            if (stepEvent == undefined) {
+            // if there isn't a note at this step, ignore
+            let note = this.steps[this.currentStep];
+            if (note == undefined) {
                 continue; // skip scheduling if it's undefined (obviously)
             }
+            // otherwise schedule a note event
             let duration = this.stepDurationInMilliseconds * this.gatePercentage;
-            let when = currentStepTimeInMilliseconds;
-            stepEvent.attackRelease(duration, when);
+            let when = this.currentStepTimeInMilliseconds;
+            new NoteEvent(note, this.delayRepeats,
+                this.delayTimeInMilliseconds, this.midiOutput,
+                this.loggingCallback).attackRelease(duration, when);
         }
     }
 
@@ -130,21 +152,32 @@ class StepSequencer {
         this.isPlaying = false;
     }
 
-    // sets a step to a note event
-    setStep(stepIndex, noteEvent) {
-        this.steps[stepIndex] = noteEvent;
+    // sets a step at step index
+    setStep(stepIndex, x) {
+        if (0 <= stepIndex && stepIndex < this.steps.length) {
+            this.steps[stepIndex] = x;
+        }
     }
 
-    // sets how long this sequence is
-    // clamped between 1 and 128 steps
+    // sets (multiple) steps offset step index
+    setSteps(stepIndex, steps) {
+        steps.forEach((x, i) => this.setStep(i + stepIndex, x));
+    }
+
+    // sets the (clamped) sequence length
     setLength(length) {
-        this.length = Math.trunc(Math.min(Math.max(1, length), 128));
+        this.length = Math.trunc(Math.min(Math.max(0, length), 128));
+    }
+
+    // sets how we want to move through the steps
+    setPlaybackMode(playbackMode) {
+        this.playbackMode = playbackMode;
     }
 
     // sets how many steps represent a beat
     // clamped between 1 and 16
     setStepsPerBeat(stepsPerBeat) {
-        this.setStepsPerBeat = Math.trunc(Math.min(Math.max(1, stepsPerBeat), 16));
+        this.stepsPerBeat = Math.trunc(Math.min(Math.max(1, stepsPerBeat), 16));
         this.calculateStepDurationInMilliseconds();
     }
 
@@ -162,5 +195,26 @@ class StepSequencer {
     // sets the gate, between 0.05 and 0.95
     setGateTime(gatePercentage) {
         this.gatePercentage = Math.min(Math.max(0.05, gatePercentage), 0.95);
+    }
+
+    setMidiOutput(midiOutput) {
+        this.midiOutput = midiOutput;
+    }
+
+    // sets the # of repeats in the delay effect, may be 0 to 9 where 0 means
+    // delay effect is off and greater than 9 is ignored
+    setDelayRepeats(numberOfRepeats) {
+        this.delayRepeats = Math.max(0, Math.min(numberOfRepeats, 9));
+    }
+
+    // sets delay time in milliseconds
+    setDelayTimeInMilliseconds(delayTimeInMilliseconds) {
+        // make sure it's greater than or equal to 0
+        delayTimeInMilliseconds = Math.max(0.0, delayTimeInMilliseconds);
+        this.delayTimeInMilliseconds = delayTimeInMilliseconds;
+    }
+
+    setLoggingCallback(callback) {
+        this.loggingCallback = callback;
     }
 }
