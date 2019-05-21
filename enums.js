@@ -17,29 +17,16 @@ const ArpeggiatorMode = {
 // "enum" for time divisions
 //  with carefully chosen values to simplify arpeggiator time division calculation
 const TimeDivision = {
-
-    // 4/4 time signature
-
-    // 16 steps
-    WHOLE_NOTE: 1.0 / 4.0,
-    // 12 steps
-    HALF_NOTE_DOTTED: 1.0 / 3.0,
-    // 8 steps
-    HALF_NOTE: 1.0 / 2.0,
-    // 6 steps
-    QUARTER_NOTE_DOTTED: 2.0 / 3.0,
-    // 4 steps
-    QUARTER_NOTE: 1.0,
-    // 3 steps
-    EIGHTH_NOTE_DOTTED: 4.0 / 3.0,
-    // 2 steps
-    EIGHTH_NOTE: 2.0,
-    // 1.5 step
-    SIXTEENTH_NOTE_DOTTED: 8.0 / 3.0,
-    // 1 step
-    SIXTEENTH_NOTE: 4.0,
-    // 0.5 step
-    THIRTY_SECOND_NOTE: 8.0,
+            // 1 step per beat
+            QUARTER_NOTE:1 ,
+            // 2 steps per beat
+            EIGHTH_NOTE:2 ,
+            // 3 steps per beat
+            EIGHTH_NOTE_TRIPLET:3 ,
+            // 4 steps per beat
+            SIXTEENTH_NOTE:4 ,
+            // 6 steps per beat
+            SIXTEENTH_NOTE_TRIPLET:6 ,
 };
 
 // "enum" for (step sequencer) playback modes
