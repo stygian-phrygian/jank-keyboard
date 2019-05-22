@@ -176,7 +176,14 @@
 
             <fieldset id="bpmSection" class="gridItem">
                 <legend>arp bpm</legend>
-                <input min="32" max="256" type="number" value="120"></input>
+                <label for="bpm">0</label>
+                <input type="range"
+                       name="bpm"
+                       min="32"
+                       max="300"
+                       value="120"
+                       step="1"
+                       >
             </fieldset>
 
             <fieldset id="loggingSection" class="gridItem">
