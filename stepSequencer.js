@@ -26,7 +26,7 @@ class StepSequencer {
         // sequencer specific variables
         //
         // how far to lookahead
-        this.lookaheadTimeInMilliseconds = 100;
+        this.lookaheadTimeInMilliseconds = 10;
         // which step (in multiples of step duration offset when it started)
         // we're currently at (or have scheduled up to)
         this.currentStepTimeInMilliseconds = 0;
@@ -134,7 +134,7 @@ class StepSequencer {
         }
         // otherwise
         // choose an arbitrary (but user unnoticeable) time from now to start
-        let startOffsetInMilliseconds = this.lookaheadTimeInMilliseconds / 2.0;
+        let startOffsetInMilliseconds = this.lookaheadTimeInMilliseconds;
         let now = performance.now();
         this.currentStepTimeInMilliseconds = now + startOffsetInMilliseconds;
         // choose which step index we're starting on
