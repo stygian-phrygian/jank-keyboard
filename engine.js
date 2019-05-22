@@ -98,6 +98,10 @@ class Engine {
         }
         this.noteEvents = unlatchedNoteEvents;
         this.updateArpeggiatorSequence();
+        // if there are no remaining note events, stop the arpeggiator
+        if (this.noteEvents.length == 0) {
+            this.arpeggiatorStepSequencer.stop();
+        }
     }
 
     // ---------------------------------------------------------------- public
