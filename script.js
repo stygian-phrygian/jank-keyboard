@@ -73,12 +73,25 @@ function keyPressed(e) {
 
     // other possible key behavior here
     switch (e.key) {
-        case "Backspace", "Delete":
+        case "Backspace":
             engine.releaseEverything();
             break;
-        case "Escape":
+        case "Delete":
             engine.hailMary();
             break;
+        case "Escape": // toggle latch mode
+            document.querySelector("#latchSection button").dispatchEvent(
+                new Event("click"));
+            break;
+        case "ArrowUp": // BPM + 10
+            break;
+        case "ArrowDown": // BPM - 10
+            break;
+        case "ArrowLeft": // BPM + 1
+            break;
+        case "ArrowRight": // BPM - 1
+            break;
+
     }
 
     if (e.altKey) {
@@ -134,23 +147,23 @@ function keyPressed(e) {
     if (e.ctrlKey) {
         switch (e.key) {
             case "ArrowUp":
-                // next layout
-                document.querySelector("#keyboardLayoutSelect").dispatchEvent(
-                    new Event("previous"));
-                break;
-            case "ArrowDown":
-                // previous layout
-                document.querySelector("#keyboardLayoutSelect").dispatchEvent(
-                    new Event("next"));
-                break;
-            case "ArrowRight":
                 // increase octave
                 document.querySelector("#octaveSelect").dispatchEvent(
                     new Event("next"));
                 break;
-            case "ArrowLeft":
+            case "ArrowDown":
                 // decrease octave
                 document.querySelector("#octaveSelect").dispatchEvent(
+                    new Event("previous"));
+                break;
+            case "ArrowRight":
+                // previous layout
+                document.querySelector("#keyboardLayoutSelect").dispatchEvent(
+                    new Event("next"));
+                break;
+            case "ArrowLeft":
+                // next layout
+                document.querySelector("#keyboardLayoutSelect").dispatchEvent(
                     new Event("previous"));
                 break;
         }
@@ -377,6 +390,7 @@ function initializeChannelSelect() {
 
 function initializeBPMInput() {
     let inputElement = document.querySelector("#bpmSection input");
+    let labelElement = document.querySelector("#bpmSection label");
     // add callback to input element change
     inputElement.addEventListener("change", (e) => {
         let v = parseFloat(e.target.value);
@@ -386,7 +400,7 @@ function initializeBPMInput() {
         // We display whatever the engine allowed to occur.
         engine.setBPM(v);
         // update our UI
-        e.target.value = engine.getBPM();
+        labelElement.textContent = engine.getBPM();
     });
     // fire initial event to set it
     inputElement.dispatchEvent(new Event("change"));
@@ -401,7 +415,7 @@ function initializeArpeggiatorGateInput() {
         // send value into engine
         engine.setArpeggiatorGateTime(v);
         // update our UI
-        labelElement.innerHTML = Math.trunc(v * 100).toString() + "%";
+        labelElement.textContent = Math.trunc(v * 100).toString() + "%";
     });
     // fire initial event to set it
     inputElement.dispatchEvent(new Event("change"));
@@ -426,7 +440,7 @@ function initializeDelayTimeInput() {
         // send value into engine
         engine.setDelayTimeInMilliseconds(v);
         // update our UI
-        labelElement.innerHTML = v.toString() + "ms";
+        labelElement.textContent = v.toString() + "ms";
     });
     // fire initial event to set it
     inputElement.dispatchEvent(new Event("change"));
@@ -453,7 +467,7 @@ function initializeDelayRepeatInput() {
         // send value into engine
         engine.setDelayRepeats(v);
         // update our UI
-        labelElement.innerHTML = v.toString();
+        labelElement.textContent = v.toString();
     });
     // fire initial event to set it
     inputElement.dispatchEvent(new Event("change"));
