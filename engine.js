@@ -113,12 +113,6 @@ class Engine {
             return;
         }
 
-        // if latch is on
-        if (this.latchOn) {
-            // find latched note events and release/remove them
-            this.releaseLatchedNotes();
-        }
-
         // create a note object
         let note = new Note(pitch, velocity, channel);
 
@@ -134,6 +128,11 @@ class Engine {
         // append the new note event
         this.noteEvents.push(noteEvent);
 
+        // if latch is on
+        if (this.latchOn) {
+            // find latched note events and release/remove them
+            this.releaseLatchedNotes();
+        }
 
         // determine how to trigger this new note
         if (this.arpeggiatorMode == ArpeggiatorMode.OFF) {
