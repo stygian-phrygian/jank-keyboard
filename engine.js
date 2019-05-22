@@ -86,6 +86,20 @@ class Engine {
         this.arpeggiatorStepSequencer.setLength(notes.length);
     }
 
+    // release (and remove from active note events) *only* the latched notes
+    releaseLatchedNotes() {
+        let unlatchedNoteEvents = [];
+        for (let i = 0; i < this.noteEvents.length; ++i) {
+            if (this.noteEvents[i].latched) {
+                this.noteEvents[i].release();
+            } else {
+                unlatchedNoteEvents.push(this.noteEvents[i]);
+            }
+        }
+        this.noteEvents = unlatchedNoteEvents;
+        this.updateArpeggiatorSequence();
+    }
+
     // ---------------------------------------------------------------- public
 
     noteOn(pitch, velocity = 96, channel = 0) {
@@ -93,6 +107,12 @@ class Engine {
         // check that some pitch was passed in and return otherwise
         if (isNaN(pitch) || (typeof(pitch) !== "number")) {
             return;
+        }
+
+        // if latch is on
+        if (this.latchOn) {
+            // find latched note events and release/remove them
+            this.releaseLatchedNotes();
         }
 
         // create a note object
@@ -103,10 +123,13 @@ class Engine {
             return;
         }
 
-        // append a new note event
+        // create the new note event
         let noteEvent = new NoteEvent(note, this.delayRepeats,
             this.delayTimeInMilliseconds, this.midiOutput, this.loggingCallback);
+
+        // append the new note event
         this.noteEvents.push(noteEvent);
+
 
         // determine how to trigger this new note
         if (this.arpeggiatorMode == ArpeggiatorMode.OFF) {
@@ -141,9 +164,20 @@ class Engine {
             return;
         }
 
-        // find note event index and splice it
+        // if latch is on
+        if (this.latchOn) {
+            // flag note event as latched and return
+            // in latch mode, note off events occur only 
+            // with future note on events
+            noteEvent.latched = true;
+            return;
+        }
+
+        // otherwise
+        // find note event index
         let noteEventIndex = this.noteEvents.findIndex(
             noteEvent => noteEvent.getNote().equals(note));
+        // remove it from engine's active note events
         this.noteEvents.splice(noteEventIndex, 1);
 
         // determine how to release this (now removed) note event
@@ -243,13 +277,14 @@ class Engine {
         this.arpeggiatorStepSequencer.setDelayTimeInMilliseconds(delayTimeInMilliseconds);
     }
 
-    //TODO
+    // sets latch
     setLatch(latchOn) {
-        if (latchOn) {
-            // TODO
-        } else {
-            // TODO
+        if (this.latchOn && !latchOn) {
+            // if we're turning latch from on to off
+            // release everything that was latched
+            this.releaseLatchedNotes();
         }
+        this.latchOn = latchOn;
     }
 
     // release every note event
