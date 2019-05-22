@@ -263,8 +263,12 @@ function midiInputCallback(midiMessage) {
     }
     let channel = midiMessage.data[0] & 0xf;
     switch (midiMessage.data[0] >> 4) {
-        case 0x9: // note on
-            engine.noteOn(midiMessage.data[1], midiMessage.data[2], channel);
+        case 0x9: // note on when velocity > 0 and note off otherwise
+            if (midiMessage.data[2] > 0) {
+                engine.noteOn(midiMessage.data[1], midiMessage.data[2], channel);
+            } else {
+                engine.noteOff(midiMessage.data[1], midiMessage.data[2], channel);
+            }
             break;
         case 0x8: // note off
             engine.noteOff(midiMessage.data[1], midiMessage.data[2], channel);
