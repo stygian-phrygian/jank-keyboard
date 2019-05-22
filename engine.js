@@ -293,10 +293,8 @@ class Engine {
 
     // release every note event
     releaseEverything() {
-        for (let i = 0; i < this.noteEvents.length; ++i) {
-            let noteEvent = this.noteEvents.pop();
-            noteEvent.release();
-        }
+        this.noteEvents.forEach(noteEvent => noteEvent.release());
+        this.noteEvents = [];
         this.updateArpeggiatorSequence();
     }
 
