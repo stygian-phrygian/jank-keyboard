@@ -116,8 +116,9 @@ class Engine {
         // create a note object
         let note = new Note(pitch, velocity, channel);
 
-        // check that this new note isn't already pressed
-        if (this.noteEvents.some(noteEvent => noteEvent.getNote().equals(note))) {
+        // if this note is already pressed (and we're not in latch mode)
+        if (this.noteEvents.some(noteEvent => noteEvent.getNote().equals(note)) &&
+            !this.latchOn) {
             return;
         }
 
