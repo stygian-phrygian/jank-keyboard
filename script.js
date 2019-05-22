@@ -48,6 +48,7 @@ function initialize() {
     initializeProgramChangeButtons();
     initializeOctaveSelect();
     initializeChannelSelect();
+    initializeLatchButton();
 
     // connect key presses/releases to midi note on/off events
     window.addEventListener("keydown", keyPressed);
@@ -559,6 +560,21 @@ function initializeArpeggiatorTimeDivisionButtons() {
     });
     // select the default button
     lastSelectedButton.click();
+}
+
+function initializeLatchButton() {
+    let button = document.querySelector("#latchSection button");
+    button.addEventListener("click", (e) => {
+        if (e.target.textContent.toLowerCase() === "off") {
+            engine.setLatch(true);
+            e.target.textContent = "on";
+            selectAndUnselectButtons(e.target, undefined);
+        } else {
+            engine.setLatch(false);
+            e.target.textContent = "off";
+            selectAndUnselectButtons(undefined, e.target);
+        }
+    });
 }
 
 function initializeProgramChangeButtons() {

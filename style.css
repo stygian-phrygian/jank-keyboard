@@ -143,6 +143,10 @@ button:hover {
     grid-row: 6;
     border-color: var(--latch-section-border-color);
 }
+#latchSection button {
+    width: 100%;
+    height: 69px;
+}
 
 
 #octaveSection {
