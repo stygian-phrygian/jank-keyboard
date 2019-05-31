@@ -391,7 +391,7 @@ function initializeBPMInput() {
     let inputElement = document.querySelector("#bpmSection input");
     let labelElement = document.querySelector("#bpmSection label");
     // add callback to input element change
-    inputElement.addEventListener("change", (e) => {
+    inputElement.addEventListener("input", (e) => {
         let v = parseFloat(e.target.value);
         // input[type=number] will APPARENTLY send invalid input outside of the
         // min/max specified.  Our engine should handle it no problemo, the
@@ -402,14 +402,14 @@ function initializeBPMInput() {
         labelElement.textContent = engine.getBPM();
     });
     // fire initial event to set it
-    inputElement.dispatchEvent(new Event("change"));
+    inputElement.dispatchEvent(new Event("input"));
 }
 
 function initializeArpeggiatorGateInput() {
     let inputElement = document.querySelector("#arpeggiatorGateSection input");
     let labelElement = document.querySelector("#arpeggiatorGateSection label");
     // add callback to input element change
-    inputElement.addEventListener("change", (e) => {
+    inputElement.addEventListener("input", (e) => {
         let v = parseFloat(e.target.value);
         // send value into engine
         engine.setArpeggiatorGateTime(v);
@@ -417,16 +417,16 @@ function initializeArpeggiatorGateInput() {
         labelElement.textContent = Math.trunc(v * 100).toString() + "%";
     });
     // fire initial event to set it
-    inputElement.dispatchEvent(new Event("change"));
+    inputElement.dispatchEvent(new Event("input"));
     // register more previous next event callbacks on this section
     element = document.querySelector("#arpeggiatorGateSection");
     element.addEventListener("next", (e) => {
         inputElement.value = parseFloat(inputElement.value) + parseFloat(inputElement.step)
-        inputElement.dispatchEvent(new Event("change"));
+        inputElement.dispatchEvent(new Event("input"));
     });
     element.addEventListener("previous", (e) => {
         inputElement.value = parseFloat(inputElement.value) - parseFloat(inputElement.step)
-        inputElement.dispatchEvent(new Event("change"));
+        inputElement.dispatchEvent(new Event("input"));
     });
 }
 
@@ -434,7 +434,7 @@ function initializeDelayTimeInput() {
     let inputElement = document.querySelector("#delayTimeSection input");
     let labelElement = document.querySelector("#delayTimeSection label");
     // add callback to input element change
-    inputElement.addEventListener("change", (e) => {
+    inputElement.addEventListener("input", (e) => {
         let v = parseInt(e.target.value);
         // send value into engine
         engine.setDelayTimeInMilliseconds(v);
@@ -442,16 +442,16 @@ function initializeDelayTimeInput() {
         labelElement.textContent = v.toString() + "ms";
     });
     // fire initial event to set it
-    inputElement.dispatchEvent(new Event("change"));
+    inputElement.dispatchEvent(new Event("input"));
     // register more previous next event callbacks on this section
     element = document.querySelector("#delayTimeSection");
     element.addEventListener("next", (e) => {
         inputElement.value = parseFloat(inputElement.value) + parseFloat(inputElement.step)
-        inputElement.dispatchEvent(new Event("change"));
+        inputElement.dispatchEvent(new Event("input"));
     });
     element.addEventListener("previous", (e) => {
         inputElement.value = parseFloat(inputElement.value) - parseFloat(inputElement.step)
-        inputElement.dispatchEvent(new Event("change"));
+        inputElement.dispatchEvent(new Event("input"));
     });
 }
 
@@ -461,7 +461,7 @@ function initializeDelayRepeatInput() {
     let inputElement = document.querySelector("#delayRepeatSection input");
     let labelElement = document.querySelector("#delayRepeatSection label");
     // add callback to input element change
-    inputElement.addEventListener("change", (e) => {
+    inputElement.addEventListener("input", (e) => {
         let v = parseInt(e.target.value);
         // send value into engine
         engine.setDelayRepeats(v);
@@ -469,16 +469,16 @@ function initializeDelayRepeatInput() {
         labelElement.textContent = v.toString();
     });
     // fire initial event to set it
-    inputElement.dispatchEvent(new Event("change"));
+    inputElement.dispatchEvent(new Event("input"));
     // register more previous next event callbacks on this section
     element = document.querySelector("#delayRepeatSection");
     element.addEventListener("next", (e) => {
         inputElement.value = parseFloat(inputElement.value) + parseFloat(inputElement.step)
-        inputElement.dispatchEvent(new Event("change"));
+        inputElement.dispatchEvent(new Event("input"));
     });
     element.addEventListener("previous", (e) => {
         inputElement.value = parseFloat(inputElement.value) - parseFloat(inputElement.step)
-        inputElement.dispatchEvent(new Event("change"));
+        inputElement.dispatchEvent(new Event("input"));
     });
 }
 
