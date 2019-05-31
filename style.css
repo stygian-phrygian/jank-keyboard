@@ -145,11 +145,16 @@ button:hover {
     grid-column: 2;
     grid-row: 6;
     border-color: var(--latch-section-border-color);
+    height: 100%;
 }
-
-#latchSection button {
+/* we need this container div so the subsumed button will expand height */
+#latchSection div {
+    height: 100%;
+}
+#latchSection div button {
     width: 100%;
-    height: 50px;
+    /* almost 100% minus the fieldset's legend's font size */
+    height: calc(88% - var(--font-size));
 }
 
 #octaveSection {
