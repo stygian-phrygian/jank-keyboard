@@ -50,7 +50,7 @@
     /* see this for discussion of the fr unit */
     /* https://css-tricks.com/introduction-fr-css-unit/ */
     grid-template-columns: repeat(6, 1fr);
-    grid-template-rows: repeat(6, 1fr);
+    grid-template-rows: repeat(7, 1fr);
     width: 100vw;
     height: 100vh;
     background: var(--background-color);
@@ -76,6 +76,7 @@ select {
 select option {
     /* I don't know why, but a value of "inherit" doesn't correctly inherit color*/
     background-color: var(--background-color);
+    text-align: center;
 }
 
 input {
@@ -107,57 +108,59 @@ button:hover {
 */
 
 #bpmSection {
-    grid-column: 1;
-    grid-row: 3;
+    grid-column: 4;
+    grid-row: 2;
     border-color: var(--bpm-section-border-color);
 }
 
-
 #keyboardLayoutSelectSection {
-    grid-column: 3 / span 2;
-    grid-row: 1;
+    grid-column: 2;
+    grid-row: 2;
     border-color: var(--keyboard-layout-select-section-border-color);
 }
 
 #loggingSection  {
-    grid-column: 5 / span 2;
-    grid-row: 1 / -1;
+    grid-column: 3;
+    grid-row: 2 / span 5;
     border-color: var(--logging-section-border-color);
+}
+#log {
+    text-align: center;
 }
 
 #outputDeviceSelectSection {
-    grid-column: 1 / span 2;
-    grid-row: 4;
+    grid-column: 4 / span 2;
+    grid-row: 5;
     border-color: var(--output-device-select-section-border-color);
 }
 
 
 #inputDeviceSelectSection {
-    grid-column: 1 / span 2;
-    grid-row: 5;
+    grid-column: 4 / span 2;
+    grid-row: 6;
     border-color: var(--input-device-select-section-border-color);
 }
 
 #latchSection{
-    grid-column: 1 / span 2;
+    grid-column: 2;
     grid-row: 6;
     border-color: var(--latch-section-border-color);
 }
+
 #latchSection button {
     width: 100%;
-    height: 69px;
+    height: 50px;
 }
 
-
 #octaveSection {
-    grid-column: 4;
-    grid-row: 2;
+    grid-column: 2;
+    grid-row: 3;
     border-color: var(--octave-section-border-color);
 }
 
 #channelSection {
-    grid-column: 3;
-    grid-row: 2;
+    grid-column: 2;
+    grid-row: 5;
     border-color: var(--channel-select-section-border-color);
 }
 
@@ -166,8 +169,8 @@ button:hover {
 }
 
 #arpeggiatorModeSection {
-    grid-column: 1;
-    grid-row: 1;
+    grid-column: 5;
+    grid-row: 2;
 }
 
 #arpeggiatorModeSectionGrid {
@@ -181,8 +184,8 @@ button:hover {
 }
 
 #arpeggiatorTimeDivisionSection {
-    grid-column: 1;
-    grid-row: 2;
+    grid-column: 4;
+    grid-row: 3;
 }
 
 #arpeggiatorTimeDivisionSectionGrid {
@@ -195,8 +198,8 @@ button:hover {
 }
 
 #arpeggiatorGateSection {
-    grid-column: 2;
-    grid-row: 1;
+    grid-column: 4;
+    grid-row: 4;
 }
 
 .delaySection {
@@ -204,23 +207,17 @@ button:hover {
 }
 
 #delayTimeSection {
-    grid-column: 2;
-    grid-row: 2;
-}
-
-#delayRepeatSection{
-    grid-column: 2;
+    grid-column: 5;
     grid-row: 3;
 }
 
-#programChangeSection{
-    grid-column: 3 / span 2;
-    grid-row: 3 / span 4;
-    border-color: var(--program-change-section-border-color);
+#delayRepeatSection{
+    grid-column: 5;
+    grid-row: 4;
 }
 
-#programChangeSectionGrid {
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    /* grid-template-rows: repeat(16, mixmax(0, 1fr)); */
+#programChangeSection{
+    grid-column: 2;
+    grid-row: 4;
+    border-color: var(--program-change-section-border-color);
 }

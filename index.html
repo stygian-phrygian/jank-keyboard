@@ -30,7 +30,7 @@
 
             <fieldset id="latchSection" class="gridItem">
                 <legend>latch</legend>
-                <button>off</button>
+                <div id="latchSectionContainer"> <button>off</button></div>
             </fieldset>
 
             <fieldset id="octaveSection" class="gridItem">
@@ -133,45 +133,40 @@
 
             <fieldset id="programChangeSection" class="gridItem">
                 <legend>program change</legend>
-                <div id="programChangeSectionGrid">
-                    <!--
-
-                        (  =___= )
-
-                    -->
-                    <button>000</button> <button>001</button> <button>002</button> <button>003</button>
-                    <button>004</button> <button>005</button> <button>006</button> <button>007</button>
-                    <button>008</button> <button>009</button> <button>010</button> <button>011</button>
-                    <button>012</button> <button>013</button> <button>014</button> <button>015</button>
-                    <button>016</button> <button>017</button> <button>018</button> <button>019</button>
-                    <button>020</button> <button>021</button> <button>022</button> <button>023</button>
-                    <button>024</button> <button>025</button> <button>026</button> <button>027</button>
-                    <button>028</button> <button>029</button> <button>030</button> <button>031</button>
-                    <button>032</button> <button>033</button> <button>034</button> <button>035</button>
-                    <button>036</button> <button>037</button> <button>038</button> <button>039</button>
-                    <button>040</button> <button>041</button> <button>042</button> <button>043</button>
-                    <button>044</button> <button>045</button> <button>046</button> <button>047</button>
-                    <button>048</button> <button>049</button> <button>050</button> <button>051</button>
-                    <button>052</button> <button>053</button> <button>054</button> <button>055</button>
-                    <button>056</button> <button>057</button> <button>058</button> <button>059</button>
-                    <button>060</button> <button>061</button> <button>062</button> <button>063</button>
-                    <button>064</button> <button>065</button> <button>066</button> <button>067</button>
-                    <button>068</button> <button>069</button> <button>070</button> <button>071</button>
-                    <button>072</button> <button>073</button> <button>074</button> <button>075</button>
-                    <button>076</button> <button>077</button> <button>078</button> <button>079</button>
-                    <button>080</button> <button>081</button> <button>082</button> <button>083</button>
-                    <button>084</button> <button>085</button> <button>086</button> <button>087</button>
-                    <button>088</button> <button>089</button> <button>090</button> <button>091</button>
-                    <button>092</button> <button>093</button> <button>094</button> <button>095</button>
-                    <button>096</button> <button>097</button> <button>098</button> <button>099</button>
-                    <button>100</button> <button>101</button> <button>102</button> <button>103</button>
-                    <button>104</button> <button>105</button> <button>106</button> <button>107</button>
-                    <button>108</button> <button>109</button> <button>110</button> <button>111</button>
-                    <button>112</button> <button>113</button> <button>114</button> <button>115</button>
-                    <button>116</button> <button>117</button> <button>118</button> <button>119</button>
-                    <button>120</button> <button>121</button> <button>122</button> <button>123</button>
-                    <button>124</button> <button>125</button> <button>126</button> <button>127</button>
-                </div>
+                <select>
+                    <option>000</option> <option>001</option> <option>002</option> <option>003</option>
+                    <option>004</option> <option>005</option> <option>006</option> <option>007</option>
+                    <option>008</option> <option>009</option> <option>010</option> <option>011</option>
+                    <option>012</option> <option>013</option> <option>014</option> <option>015</option>
+                    <option>016</option> <option>017</option> <option>018</option> <option>019</option>
+                    <option>020</option> <option>021</option> <option>022</option> <option>023</option>
+                    <option>024</option> <option>025</option> <option>026</option> <option>027</option>
+                    <option>028</option> <option>029</option> <option>030</option> <option>031</option>
+                    <option>032</option> <option>033</option> <option>034</option> <option>035</option>
+                    <option>036</option> <option>037</option> <option>038</option> <option>039</option>
+                    <option>040</option> <option>041</option> <option>042</option> <option>043</option>
+                    <option>044</option> <option>045</option> <option>046</option> <option>047</option>
+                    <option>048</option> <option>049</option> <option>050</option> <option>051</option>
+                    <option>052</option> <option>053</option> <option>054</option> <option>055</option>
+                    <option>056</option> <option>057</option> <option>058</option> <option>059</option>
+                    <option>060</option> <option>061</option> <option>062</option> <option>063</option>
+                    <option>064</option> <option>065</option> <option>066</option> <option>067</option>
+                    <option>068</option> <option>069</option> <option>070</option> <option>071</option>
+                    <option>072</option> <option>073</option> <option>074</option> <option>075</option>
+                    <option>076</option> <option>077</option> <option>078</option> <option>079</option>
+                    <option>080</option> <option>081</option> <option>082</option> <option>083</option>
+                    <option>084</option> <option>085</option> <option>086</option> <option>087</option>
+                    <option>088</option> <option>089</option> <option>090</option> <option>091</option>
+                    <option>092</option> <option>093</option> <option>094</option> <option>095</option>
+                    <option>096</option> <option>097</option> <option>098</option> <option>099</option>
+                    <option>100</option> <option>101</option> <option>102</option> <option>103</option>
+                    <option>104</option> <option>105</option> <option>106</option> <option>107</option>
+                    <option>108</option> <option>109</option> <option>110</option> <option>111</option>
+                    <option>112</option> <option>113</option> <option>114</option> <option>115</option>
+                    <option>116</option> <option>117</option> <option>118</option> <option>119</option>
+                    <option>120</option> <option>121</option> <option>122</option> <option>123</option>
+                    <option>124</option> <option>125</option> <option>126</option> <option>127</option>
+                </select>
             </fieldset>
 
             <fieldset id="bpmSection" class="gridItem">
