@@ -18,6 +18,7 @@ Turn your computer keyboard into a MIDI keyboard.
     alt-down/alt-up        => Arpeggiator Gate decrease/increase
     shift-left/shift-right => Delay Time decrease/increase
     shift-down/shift-up    => Delay Repeat decrease/increase
+    page-down/page-up      => Program Change decrease/increase
     escape                 => Toggle Latch Mode
     backspace              => Note OFF all existing notes
     delete                 => Note OFF every possible note
