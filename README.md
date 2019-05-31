@@ -16,8 +16,8 @@ Turn your computer keyboard into a MIDI keyboard.
     ctrl-down/ctrl-up      => Octave down/up
     alt-left/alt-right     => Arpeggiator Mode previous/next
     alt-down/alt-up        => Arpeggiator Gate decrease/increase
-    shift-left/shift-right => Delay Repeat decrease/increase
-    shift-down/shift-up    => Delay Time decrease/increase
+    shift-left/shift-right => Delay Time decrease/increase
+    shift-down/shift-up    => Delay Repeat decrease/increase
     escape                 => Toggle Latch Mode
     backspace              => Note OFF all existing notes
     delete                 => Note OFF every possible note
@@ -25,9 +25,4 @@ Turn your computer keyboard into a MIDI keyboard.
 
 ## Screenshot
 ![screenshot](screenshot.png)
-
-## TODO
-* add web audio organ synth
-
-
 

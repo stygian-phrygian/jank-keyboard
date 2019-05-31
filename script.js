@@ -122,23 +122,23 @@ function keyPressed(e) {
     if (e.shiftKey) {
         switch (e.key) {
             case "ArrowUp":
-                // increase delay time
-                document.querySelector("#delayTimeSection").dispatchEvent(
-                    new Event("next"));
-                break;
-            case "ArrowDown":
-                // decrease delay time
-                document.querySelector("#delayTimeSection").dispatchEvent(
-                    new Event("previous"));
-                break;
-            case "ArrowRight":
                 // increase delay repeats
                 document.querySelector("#delayRepeatSection").dispatchEvent(
                     new Event("next"));
                 break;
-            case "ArrowLeft":
+            case "ArrowDown":
                 // decrease delay repeats
                 document.querySelector("#delayRepeatSection").dispatchEvent(
+                    new Event("previous"));
+                break;
+            case "ArrowRight":
+                // increase delay time
+                document.querySelector("#delayTimeSection").dispatchEvent(
+                    new Event("next"));
+                break;
+            case "ArrowLeft":
+                // decrease delay time
+                document.querySelector("#delayTimeSection").dispatchEvent(
                     new Event("previous"));
                 break;
         }
