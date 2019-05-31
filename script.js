@@ -45,7 +45,7 @@ function initialize() {
     initializeDelayTimeInput();
     initializeDelayRepeatInput();
     initializeBPMInput();
-    initializeProgramChangeButtons();
+    initializeProgramChangeSelect();
     initializeOctaveSelect();
     initializeChannelSelect();
     initializeLatchButton();
@@ -83,15 +83,14 @@ function keyPressed(e) {
             document.querySelector("#latchSection button").dispatchEvent(
                 new Event("click"));
             break;
-        case "ArrowUp": // BPM + 10
+        case "PageUp":
+            document.querySelector("#programChangeSection select").dispatchEvent(
+                new Event("next"));
             break;
-        case "ArrowDown": // BPM - 10
+        case "PageDown":
+            document.querySelector("#programChangeSection select").dispatchEvent(
+                new Event("previous"));
             break;
-        case "ArrowLeft": // BPM + 1
-            break;
-        case "ArrowRight": // BPM - 1
-            break;
-
     }
 
     if (e.altKey) {
@@ -595,24 +594,31 @@ function initializeLatchButton() {
     });
 }
 
-function initializeProgramChangeButtons() {
-    let element = document.querySelector("#programChangeSection");
-    let lastSelectedButton;
-    element.addEventListener("click", (e) => {
-        // return if we're not responding to a button
-        if (e.target.tagName.toLowerCase() !== "button") {
-            return;
-        }
+function initializeProgramChangeSelect() {
+    let selectElement = document.querySelector("#programChangeSection select");
+    // add a callback to the select element
+    selectElement.addEventListener("change", (e) => {
         // parse the value from this button and return on weird
-        let programChangeValue = parseInt(e.target.innerText);
+        let programChangeValue = parseInt(e.target.value);
         if (programChangeValue == undefined) {
             return;
         }
         // send the message
         engine.programChange(programChangeValue, midiChannel);
-        // update button style
-        selectAndUnselectButtons(e.target, lastSelectedButton);
-        lastSelectedButton = e.target;
+    });
+
+    // attach callbacks for next and previous events
+    selectElement.addEventListener("next", (e) => {
+        selectElement.selectedIndex = (selectElement.selectedIndex + 1) % selectElement.length;
+        selectElement.dispatchEvent(new Event("change"));
+    });
+    selectElement.addEventListener("previous", (e) => {
+        if (selectElement.selectedIndex > 0) {
+            selectElement.selectedIndex -= 1;
+        } else {
+            selectElement.selectedIndex = selectElement.length - 1;
+        }
+        selectElement.dispatchEvent(new Event("change"));
     });
 }
 
