@@ -91,6 +91,9 @@ function keyPressed(e) {
             document.querySelector("#programChangeSection select").dispatchEvent(
                 new Event("previous"));
             break;
+        case "F5":
+            location.reload();
+            break;
     }
 
     if (e.altKey) {
