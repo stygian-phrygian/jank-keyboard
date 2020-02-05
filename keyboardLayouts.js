@@ -147,8 +147,6 @@ const keyboardLayouts = {
         "=": 31,
     },
 
-
-
     // melodic layout
     // columns ascending in perfect 4ths
     // rows ascending in major 2nds
@@ -278,6 +276,132 @@ const keyboardLayouts = {
         // col 12 (somewhat incomplete)
         "]": 28,
         "=": 31,
+    },
+
+    // melodic layout (vers 3)
+    // columns ascending in minor 2nds
+    // rows ascending in major 2nds
+    //
+    "melodic vers. 3": {
+        // col 1
+        "z": 0,
+        "a": 1,
+        "q": 2,
+        "1": 3,
+        // col 2
+        "x": 2,
+        "s": 3,
+        "w": 4,
+        "2": 5,
+        // col 3
+        "c": 4,
+        "d": 5,
+        "e": 6,
+        "3": 7,
+        // col 4
+        "v": 6,
+        "f": 7,
+        "r": 8,
+        "4": 9,
+        // col 5
+        "b": 8,
+        "g": 9,
+        "t": 10,
+        "5": 11,
+        // col 6
+        "n": 10,
+        "h": 11,
+        "y": 12,
+        "6": 13,
+        // col 7
+        "m": 12,
+        "j": 13,
+        "u": 14,
+        "7": 15,
+        // col 8
+        ",": 14,
+        "k": 15,
+        "i": 16,
+        "8": 17,
+        // col 9
+        ".": 16,
+        "l": 17,
+        "o": 18,
+        "9": 19,
+        // col 10
+        "/": 18,
+        ";": 19,
+        "p": 20,
+        "0": 21,
+        // col 11 (somewhat incomplete)
+        "'": 21,
+        "[": 22,
+        "-": 23,
+        // col 12 (somewhat incomplete)
+        "]": 24,
+        "=": 25,
+    },
+
+    // diminished scale layout
+    // rows: 4th transposed alternating modes
+    "diminished": {
+        // col 1
+        "z": 0,
+        "a": 5,
+        "q": 11,
+        "1": 16,
+        // col 2
+        "x": 1,
+        "s": 7,
+        "w": 12,
+        "2": 18,
+        // col 3
+        "c": 3,
+        "d": 8,
+        "e": 14,
+        "3": 19,
+        // col 4
+        "v": 4,
+        "f": 10,
+        "r": 15,
+        "4": 21,
+        // col 5
+        "b": 6,
+        "g": 11,
+        "t": 17,
+        "5": 22,
+        // col 6
+        "n": 7,
+        "h": 13,
+        "y": 18,
+        "6": 24,
+        // col 7
+        "m": 9,
+        "j": 14,
+        "u": 20,
+        "7": 25,
+        // col 8
+        ",": 10,
+        "k": 16,
+        "i": 21,
+        "8": 27,
+        // col 9
+        ".": 12,
+        "l": 17,
+        "o": 23,
+        "9": 28,
+        // col 10
+        "/": 13,
+        ";": 19,
+        "p": 24,
+        "0": 30,
+        // col 11 (somewhat incomplete)
+        "'": 20,
+        "[": 26,
+        "-": 31,
+        // col 12 (somewhat incomplete)
+        "]": 27,
+        "=": 33,
     },
 
     // major 3rds inverted layout
@@ -537,6 +661,194 @@ const keyboardLayouts = {
         "=": 30,
     },
 
+    // alternating min/maj 3rds
+    // columns ascending in minor 2nds
+    // rows    ascending in minor/major 3rds alternating
+    "alternating min/maj 3rds": {
+        // col 1
+        "z": 0,
+        "a": 1,
+        "q": 2,
+        "1": 3,
+        // col 2
+        "x": 3,
+        "s": 4,
+        "w": 5,
+        "2": 6,
+        // col 3
+        "c": 7,
+        "d": 8,
+        "e": 9,
+        "3": 10,
+        // col 4
+        "v": 10,
+        "f": 11,
+        "r": 12,
+        "4": 13,
+        // col 5
+        "b": 14,
+        "g": 15,
+        "t": 16,
+        "5": 17,
+        // col 6
+        "n": 17,
+        "h": 18,
+        "y": 19,
+        "6": 20,
+        // col 7
+        "m": 21,
+        "j": 22,
+        "u": 23,
+        "7": 24,
+        // col 8
+        ",": 24,
+        "k": 25,
+        "i": 26,
+        "8": 27,
+        // col 9
+        ".": 28,
+        "l": 29,
+        "o": 30,
+        "9": 31,
+        // col 10
+        "/": 31,
+        ";": 32,
+        "p": 33,
+        "0": 34,
+        // col 11 (somewhat incomplete)
+        "'": 36,
+        "[": 37,
+        "-": 38,
+        // col 12 (somewhat incomplete)
+        "]": 40,
+        "=": 41,
+    },
+
+    // alternating maj/min 3rds
+    // columns ascending in minor 2nds
+    // rows    ascending in manor/minor 3rds alternating
+    "alternating maj/min 3rds": {
+        // col 1
+        "z": 0,
+        "a": 1,
+        "q": 2,
+        "1": 3,
+        // col 2
+        "x": 4,
+        "s": 5,
+        "w": 6,
+        "2": 7,
+        // col 3
+        "c": 7,
+        "d": 8,
+        "e": 9,
+        "3": 10,
+        // col 4
+        "v": 11,
+        "f": 12,
+        "r": 13,
+        "4": 14,
+        // col 5
+        "b": 14,
+        "g": 15,
+        "t": 16,
+        "5": 17,
+        // col 6
+        "n": 18,
+        "h": 19,
+        "y": 20,
+        "6": 21,
+        // col 7
+        "m": 21,
+        "j": 22,
+        "u": 23,
+        "7": 24,
+        // col 8
+        ",": 25,
+        "k": 26,
+        "i": 27,
+        "8": 28,
+        // col 9
+        ".": 28,
+        "l": 29,
+        "o": 30,
+        "9": 31,
+        // col 10
+        "/": 32,
+        ";": 33,
+        "p": 34,
+        "0": 35,
+        // col 11 (somewhat incomplete)
+        "'": 36,
+        "[": 37,
+        "-": 38,
+        // col 12 (somewhat incomplete)
+        "]": 41,
+        "=": 42,
+    },
+
+    // pentatonic
+    // columns ascending in minor 2nds
+    // rows    ascending in pentatonic minor notes
+    "pentatonic minor": {
+        // col 1
+        "z": 0,
+        "a": 1,
+        "q": 2,
+        "1": 3,
+        // col 2
+        "x": 3,
+        "s": 4,
+        "w": 5,
+        "2": 6,
+        // col 3
+        "c": 5,
+        "d": 6,
+        "e": 7,
+        "3": 8,
+        // col 4
+        "v": 7,
+        "f": 8,
+        "r": 9,
+        "4": 10,
+        // col 5
+        "b": 10,
+        "g": 11,
+        "t": 12,
+        "5": 13,
+        // col 6
+        "n": 12,
+        "h": 13,
+        "y": 14,
+        "6": 15,
+        // col 7
+        "m": 15,
+        "j": 16,
+        "u": 17,
+        "7": 18,
+        // col 8
+        ",": 17,
+        "k": 18,
+        "i": 19,
+        "8": 20,
+        // col 9
+        ".": 19,
+        "l": 20,
+        "o": 21,
+        "9": 22,
+        // col 10
+        "/": 22,
+        ";": 23,
+        "p": 24,
+        "0": 25,
+        // col 11 (somewhat incomplete)
+        "'": 25,
+        "[": 26,
+        "-": 27,
+        // col 12 (somewhat incomplete)
+        "]": 29,
+        "=": 30,
+    },
 
     // perfect 4ths layout
     // columns ascending in perfect 4ths
