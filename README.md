@@ -9,6 +9,9 @@ Turn your computer keyboard into a MIDI keyboard.
 * Play with the arpeggiator and delay
 * Type on your keyboard to trigger and release midi notes
 
+Nota Bene: make sure you're running a synth to receive the midi output (and
+thus hear anything)
+
 ## Keybindings
 ```
     letter/numbers         => MIDI Note ON/OFF
